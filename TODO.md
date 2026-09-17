@@ -9,10 +9,9 @@ work lives in the sibling `../ffb` repo (its own remaining tasks aren't duplicat
       `.nvmrc`, configurable `FFB_SERVER_*` host/port, `index.html` merge-conflict-marker fix,
       `Promise<any>`→`Promise<void>` type fixes, and initial `join`/`status`/`version`/
       `passwordchallenge` command handlers — committed to branch `dev-ui`.
-- [ ] Generate and commit `package-lock.json` (currently only exists inside the Docker image layer /
-      named volume, not in this checkout — builds aren't reproducible without it). `npm install` itself
-      is no longer blocked (verified working from a session with normal registry access on
-      2026-09-17), this just hasn't been done yet — run `npm install` and commit the resulting lockfile.
+- [x] Generate and commit `package-lock.json` — done from a clean `npm install` (644 packages),
+      verified reproducible with `npm ci`, and `npm test`/`tsc --noEmit`/`npm run build` all still pass
+      against it. Removed it from `.gitignore`.
 - [x] Fix the toolchain gaps the Phaser 3.11→3.87/3.90 bump left behind, found while actually running
       `npm test`/`tsc`/`npm run build` for the first time post-upgrade (previously untested — see P1):
       a stale vendored `phaser.d.ts` (from before Phaser shipped its own types) was silently masking

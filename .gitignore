@@ -5,6 +5,5 @@ build/
 
 tags
 auth.json
-package-lock.json
 
 *.log

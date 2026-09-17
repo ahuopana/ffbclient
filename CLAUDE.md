@@ -56,8 +56,6 @@ updating that file too. `origin` here is `ahuopana/ffbclient` (fork); `upstream`
 
 ## Known gotchas
 
-- No `package-lock.json` is committed yet — `npm install` currently only runs inside the Docker image
-  build, so it isn't reproducible from a bare checkout. See `TODO.md`.
 - `webpack.config.js` is read once at `webpack serve` startup, not watched — changes there need a
   container restart (`podman restart fumbbl_client_1`), unlike `.ts` source changes.
 - TS config uses `moduleResolution: "bundler"` (TS 5+) deliberately, to avoid the `node10` deprecation
