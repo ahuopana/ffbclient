@@ -26,6 +26,7 @@ export class ConnectionInfo {
     private gameList: FFB.Protocol.Messages.GameListEntryType[];
     private userSettings: {[key: string]: string};
     private teamSetupNames: string[];
+    private lastPongTimestamp: number;
 
     public constructor() {
         this.joined = false;
@@ -168,5 +169,13 @@ export class ConnectionInfo {
 
     public getTeamSetupNames(): string[] {
         return this.teamSetupNames;
+    }
+
+    public setLastPongTimestamp(timestamp: number) {
+        this.lastPongTimestamp = timestamp;
+    }
+
+    public getLastPongTimestamp(): number {
+        return this.lastPongTimestamp;
     }
 }

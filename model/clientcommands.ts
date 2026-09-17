@@ -1059,6 +1059,93 @@ export class SetAutomaticPlayerMarkings extends AbstractCommand {
     }
 }
 
+export class ReplayCommands extends AbstractCommand {
+    private commandArray: any[];
+
+    public constructor(data: FFB.Protocol.Messages.ServerReplay) {
+        super();
+        this.commandArray = data.commandArray || [];
+        this.triggerModelChanged = false;
+    }
+
+    public do() {
+        for (let replayedCommand of this.commandArray) {
+            this.controller.handleReplayedCommand(replayedCommand);
+        }
+    }
+
+    public undo() {
+    }
+}
+
+export class SetReplayStatus extends AbstractCommand {
+    private data: FFB.Protocol.Messages.ServerReplayStatus;
+
+    public constructor(data: FFB.Protocol.Messages.ServerReplayStatus) {
+        super();
+        this.data = data;
+        this.triggerModelChanged = false;
+    }
+
+    public do() {
+        this.game.getReplayInfo().setStatus(this.data);
+    }
+
+    public undo() {
+    }
+}
+
+export class SetReplayController extends AbstractCommand {
+    private coach: string;
+
+    public constructor(data: FFB.Protocol.Messages.ServerReplayControl) {
+        super();
+        this.coach = data.coach;
+        this.triggerModelChanged = false;
+    }
+
+    public do() {
+        this.game.getReplayInfo().setControllingCoach(this.coach);
+    }
+
+    public undo() {
+    }
+}
+
+export class SetPong extends AbstractCommand {
+    private timestamp: number;
+
+    public constructor(data: FFB.Protocol.Messages.ServerPong) {
+        super();
+        this.timestamp = data.timestamp;
+        this.triggerModelChanged = false;
+    }
+
+    public do() {
+        this.game.getConnectionInfo().setLastPongTimestamp(this.timestamp);
+    }
+
+    public undo() {
+    }
+}
+
+export class AddAdminMessages extends AbstractCommand {
+    private messages: string[];
+
+    public constructor(data: FFB.Protocol.Messages.ServerAdminMessage) {
+        super();
+        this.messages = data.messageArray || [];
+        this.triggerModelChanged = false;
+    }
+
+    public do() {
+        this.game.addAdminMessages(this.messages);
+    }
+
+    public undo() {
+    }
+}
+
 export class KickoffResult extends AbstractCommand {
     private roll: number[];
     private result: string;

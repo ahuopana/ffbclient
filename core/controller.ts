@@ -14,6 +14,7 @@ export class Controller {
     private soundEngine: Core.SoundEngine;
     private eventListeners: Types.EventListener[];
     private network: Core.Network;
+    private commandHandler: Core.CommandHandler;
     private diceManager: Core.DiceManager;
     private scenes: { [key: string]: Phaser.Scene }
     private scale: number;
@@ -138,8 +139,16 @@ export class Controller {
     }
 
     public connect(config: any) {
-        let commandHandler = new Core.CommandHandler(this.network, this);
-        this.network.connect(commandHandler, config);
+        this.commandHandler = new Core.CommandHandler(this.network, this);
+        this.network.connect(this.commandHandler, config);
+    }
+
+    /**
+     * Re-dispatches a command from inside a serverReplay batch through the
+     * normal command pipeline, exactly as if it had arrived live.
+     */
+    public handleReplayedCommand(data: any) {
+        this.commandHandler.handleCommand(data);
     }
 
     public disconnect() {

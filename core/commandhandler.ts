@@ -35,6 +35,11 @@ export class CommandHandler {
             "serverSetPreventSketching": new Commands.CommandSetPreventSketching(controller),
             "serverUpdateLocalPlayerMarkers": new Commands.CommandUpdateLocalPlayerMarkers(controller),
             "serverAutomaticPlayerMarkings": new Commands.CommandAutomaticPlayerMarkings(controller),
+            "serverReplay": new Commands.CommandReplay(controller),
+            "serverReplayStatus": new Commands.CommandReplayStatus(controller),
+            "serverReplayControl": new Commands.CommandReplayControl(controller),
+            "serverPong": new Commands.CommandPong(controller),
+            "serverAdminMessage": new Commands.CommandAdminMessage(controller),
         };
         this.network = network;
         this.controller = controller;

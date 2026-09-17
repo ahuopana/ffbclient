@@ -24,6 +24,9 @@ export class Game {
 
     private automaticPlayerMarkings: {index: number, markings: {[playerId: string]: string}};
 
+    public replayInfo: Model.ReplayInfo;
+    private adminMessages: string[];
+
     /**
      * Root internal model class.
      *
@@ -40,6 +43,12 @@ export class Game {
         this.sketches = {};
         this.preventSketching = false;
         this.automaticPlayerMarkings = null;
+        this.replayInfo = new Model.ReplayInfo();
+        this.adminMessages = [];
+    }
+
+    public getReplayInfo(): Model.ReplayInfo {
+        return this.replayInfo;
     }
 
     public getConnectionInfo(): Model.ConnectionInfo {
@@ -229,6 +238,14 @@ export class Game {
 
     public getAutomaticPlayerMarkings(): {index: number, markings: {[playerId: string]: string}} {
         return this.automaticPlayerMarkings;
+    }
+
+    public addAdminMessages(messages: string[]) {
+        this.adminMessages = this.adminMessages.concat(messages);
+    }
+
+    public getAdminMessages(): string[] {
+        return this.adminMessages;
     }
 
     public getPlayingSide(): Model.Side {

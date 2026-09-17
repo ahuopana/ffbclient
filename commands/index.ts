@@ -26,3 +26,8 @@ export { CommandClearSketches } from "./clearsketches";
 export { CommandSetPreventSketching } from "./setpreventsketching";
 export { CommandUpdateLocalPlayerMarkers } from "./updatelocalplayermarkers";
 export { CommandAutomaticPlayerMarkings } from "./automaticplayermarkings";
+export { CommandReplay } from "./replay";
+export { CommandReplayStatus } from "./replaystatus";
+export { CommandReplayControl } from "./replaycontrol";
+export { CommandPong } from "./pong";
+export { CommandAdminMessage } from "./adminmessage";
