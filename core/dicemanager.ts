@@ -232,24 +232,28 @@ export class DiceManager {
         sprite.setPosition(x + start.x, y + start.y);
         sprite.setScale(scale * this.scale, scale * this.scale);
 
-        let timeline = this.scene.tweens.createTimeline({});
-
-        timeline.add({
-            targets: sprite,
-            ease: 'Circ.easeOut',
-            duration: duration * 3 / 4,
-            delay: delay,
-            scaleX: 4 * scale * this.scale,
-            scaleY: 4 * scale * this.scale,
-        });
-
-        timeline.add({
-            targets: sprite,
-            ease: 'Bounce.easeOut',
-            duration: duration * 1 / 4,
-            scaleX: scale * this.scale,
-            scaleY: scale * this.scale,
-        });
+        let timeline = this.scene.add.timeline([
+            {
+                at: delay,
+                tween: {
+                    targets: sprite,
+                    ease: 'Circ.easeOut',
+                    duration: duration * 3 / 4,
+                    scaleX: 4 * scale * this.scale,
+                    scaleY: 4 * scale * this.scale,
+                },
+            },
+            {
+                at: delay + duration * 3 / 4,
+                tween: {
+                    targets: sprite,
+                    ease: 'Bounce.easeOut',
+                    duration: duration * 1 / 4,
+                    scaleX: scale * this.scale,
+                    scaleY: scale * this.scale,
+                },
+            },
+        ]);
 
         timeline.play();
 

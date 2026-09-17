@@ -28,15 +28,17 @@ export default class App extends Phaser.Game implements EventListener {
             new Scenes.MainScene(controller),
         ];
 
-        let config:GameConfig = {
+        let config: Phaser.Types.Core.GameConfig = {
             parent: 'phaserapp',
             type: Phaser.CANVAS,
             width: 960,
             height: 540,
             scene: <Phaser.Scene[]>scenes,
-            "render.antialias": true,
-            "render.pixelArt": false,
-            "render.roundPixels": false,
+            render: {
+                antialias: true,
+                pixelArt: false,
+                roundPixels: false,
+            },
             fps: {
                 target: 60,
             }

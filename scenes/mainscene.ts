@@ -10,7 +10,7 @@ import Point = Phaser.Geom.Point;
 export class MainScene extends Scenes.AbstractScene implements Types.EventListener {
     private i: Phaser.Input.InputPlugin;
     private dragStart: Phaser.Geom.Point;
-    private scale: number;
+    private zoomScale: number;
     private width: number;
     private height: number;
     private dirty: boolean;
@@ -72,7 +72,7 @@ export class MainScene extends Scenes.AbstractScene implements Types.EventListen
     public init(config) {
         console.log('Main Scene: init', config);
 
-        this.scale = 1.0;
+        this.zoomScale = 1.0;
 
         this.width = this.sys.canvas.width;
         this.height = this.sys.canvas.height;
@@ -166,7 +166,7 @@ export class MainScene extends Scenes.AbstractScene implements Types.EventListen
         this.width = w;
         this.height = h;
 
-        this.sys.game.resize(w, h);
+        this.scale.resize(w, h);
 
         let marginTop = h / 16;
         let marginBottom = 0;

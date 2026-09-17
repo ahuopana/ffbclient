@@ -10,28 +10,49 @@ work lives in the sibling `../ffb` repo (its own remaining tasks aren't duplicat
       `Promise<any>`→`Promise<void>` type fixes, and initial `join`/`status`/`version`/
       `passwordchallenge` command handlers — committed to branch `dev-ui`.
 - [ ] Generate and commit `package-lock.json` (currently only exists inside the Docker image layer /
-      named volume, not in this checkout — builds aren't reproducible without it).
+      named volume, not in this checkout — builds aren't reproducible without it). `npm install` itself
+      is no longer blocked (verified working from a session with normal registry access on
+      2026-09-17), this just hasn't been done yet — run `npm install` and commit the resulting lockfile.
+- [x] Fix the toolchain gaps the Phaser 3.11→3.87/3.90 bump left behind, found while actually running
+      `npm test`/`tsc`/`npm run build` for the first time post-upgrade (previously untested — see P1):
+      a stale vendored `phaser.d.ts` (from before Phaser shipped its own types) was silently masking
+      real type errors project-wide via a now-broken `tsconfig.json` `paths` override; once removed,
+      that surfaced several genuine Phaser 3.90 API breaks (`TweenManager.createTimeline` → the new
+      `Timeline` game object API in `core/dicemanager.ts` + `scenes/layers/floattext.ts`,
+      `TextStyle.fill` → `color`, `Sprite.setScaleMode` → `texture.setFilter`, `Game.resize` →
+      `Scene.scale.resize`, an untyped/dotted `GameConfig`, and a `MainScene` field shadowing
+      `Phaser.Scene.scale`). Also fixed `jest.config.js` resolving `phaser`'s raw, un-built `src/`
+      entry point instead of the `dist/` bundle webpack uses (which pulled in a debug-only dependency
+      that isn't installed), and added `jest-canvas-mock` since jsdom's `<canvas>` has no real 2D
+      context. `npm test`/`tsc --noEmit`/`npm run build` all pass clean now.
 - [ ] Open a PR from `dev-ui` once P1 below is verified (or earlier, for visibility).
 
 ## P1 — verify the basic connect/spectate flow works end to end
 
 The join handshake (`serverJoin`/`serverStatus`/`serverVersion`/`serverPasswordChallenge`) was the
-first confirmed blocker and now has minimal handlers (they `console.log`, no UI state changes yet).
-The 5 previously-existing handlers (`serverGameState`, `serverModelSync`, `serverGameTime`,
-`serverTalk`, `serverSound`) already cover the core "watch a game in progress" data path — so a full
-manual test of spectating a live game against the containerized server is the next high-value thing to
-try, not more handler-writing yet.
+first confirmed blocker. The 5 previously-existing handlers (`serverGameState`, `serverModelSync`,
+`serverGameTime`, `serverTalk`, `serverSound`) already cover the core "watch a game in progress" data
+path — so a full manual test of spectating a live game against the containerized server is still the
+next high-value thing to try.
 
+- [x] Turn the 4 handshake handlers from `console.log`-only stubs into real state updates: a new
+      `Model.ConnectionInfo` (on `Game`) tracks join info / server status / server-vs-client version /
+      password-challenge state, each handler enqueues a `ClientCommands.Set*` that updates it and fires
+      a new `EventType.ConnectionInfoChanged`, and `ConnectScene` listens for that event and replaces the
+      static "Connecting..." text with the actual status (server unavailable + reason, version mismatch,
+      authenticating, joined as `<coach>`). Unit tests in `tests/model/connectioninfo.test.ts`,
+      `tests/model/clientcommands.test.ts`, `tests/commands/*.test.ts` — committed to `dev-ui`, and now
+      verified actually passing under `npm test` (all 35 tests, 7 suites) now that the toolchain gaps
+      above are fixed — they hadn't been runnable before. **Still needs manual verification against a
+      real/containerized server**, the next item below.
 - [ ] Get an actual game running on the containerized `ffb-server` to spectate against (the DB seeds
       test coaches `Kalimar`/`BattleLore`/`LordCrunchy`/`LordMisery` via `DbInitializer`; check
       `../ffb/ffb-server/teams/*.xml` for loadable teams, or start a game via the legacy AWT client
       pointed at `localhost:22227`).
 - [ ] Drive this client's connect scene through a real join (bypass the `fumbblapi.js`/fumbbl.com OAuth
       lobby for local testing — e.g. set `#wrapper`'s `user`/`auth`/`game` attributes manually, or add a
-      dev-only shortcut) and confirm in the browser console that `Joined as...` / `Server status:` /
-      `Server version:` log, and that the game state actually renders.
-- [ ] Once confirmed, turn the new handlers from `console.log` stubs into real state updates (e.g.
-      `serverStatus`/`serverVersion` should probably surface to the UI, not just the console).
+      dev-only shortcut) and confirm the loading screen now shows the status/version/join text described
+      above, and that the game state actually renders.
 
 ## P2 — protocol/command parity (the bulk of the remaining work)
 

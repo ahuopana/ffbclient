@@ -65,3 +65,10 @@ updating that file too. `origin` here is `ahuopana/ffbclient` (fork); `upstream`
 - `jest.config.js` overrides `ts-jest`'s `module`/`moduleResolution` to `commonjs`/`node` even though
   `tsconfig.json` targets `esnext`/`bundler` for the webpack build — Jest runs CommonJS, webpack doesn't;
   don't "simplify" this into one shared config.
+- `jest.config.js` also maps `phaser` to `node_modules/phaser/dist/phaser.js` (its `moduleNameMapper`)
+  and loads `jest-canvas-mock` (`setupFiles`). Needed because: (1) Jest's plain CommonJS resolution
+  follows `phaser`'s `package.json` `"main"` field (raw, un-built `src/phaser.js`), not the `"browser"`
+  field webpack uses (`dist/phaser.js`) — the raw source still contains a debug-only
+  `require('phaser3spectorjs')` that the pre-built dist bundle has stripped, and that package isn't a
+  real dependency; (2) Phaser's device-feature-detection code runs at import time and needs a working
+  `<canvas>` 2D context, which jsdom doesn't provide without a mock/polyfill.

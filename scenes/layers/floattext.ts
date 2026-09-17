@@ -54,7 +54,7 @@ export class FloatText extends Layers.Abstract {
 
         let t = this.scene.add.text(x, y, kickoff.toUpperCase(), {
             fontSize: (this.gridSize * 2.5) + 'px',
-            fill: 'white',
+            color: 'white',
             stroke: 'black',
             strokeThickness: 2,
         });
@@ -62,26 +62,31 @@ export class FloatText extends Layers.Abstract {
         t.setOrigin(0.5);
         t.setScale(0);
 
-        let timeline = this.scene.tweens.createTimeline({});
-
-        timeline.add({
-            targets: t,
-            duration: 1000,
-            ease: 'Quad.easeIn',
-            scaleX: 1,
-            scaleY: 1,
-        });
-
-        timeline.add({
-            targets: t,
-            duration: 1000,
-            alpha: 0,
-            ease: 'Expo.easeIn',
-            onComplete: () => {
-                t.visible = false;
-                t.destroy();
-            }
-        });
+        let timeline = this.scene.add.timeline([
+            {
+                at: 0,
+                tween: {
+                    targets: t,
+                    duration: 1000,
+                    ease: 'Quad.easeIn',
+                    scaleX: 1,
+                    scaleY: 1,
+                },
+            },
+            {
+                at: 1000,
+                tween: {
+                    targets: t,
+                    duration: 1000,
+                    alpha: 0,
+                    ease: 'Expo.easeIn',
+                    onComplete: () => {
+                        t.visible = false;
+                        t.destroy();
+                    },
+                },
+            },
+        ]);
         timeline.play();
 
     }
@@ -95,7 +100,7 @@ export class FloatText extends Layers.Abstract {
         let [x, y] = this.controller.convertToPixels(pos);
         let t = this.scene.add.text(x, y, text.toUpperCase(), {
             fontSize: (this.gridSize / 3) + 'px',
-            fill: 'white',
+            color: 'white',
             stroke: 'black',
             strokeThickness: 2,
 

@@ -687,6 +687,79 @@ export class PickupRoll extends AbstractCommand {
     }
 }
 
+export class SetJoinInfo extends AbstractCommand {
+    private data: FFB.Protocol.Messages.ServerJoin;
+
+    public constructor(data: FFB.Protocol.Messages.ServerJoin) {
+        super();
+        this.data = data;
+        this.triggerModelChanged = false;
+    }
+
+    public do() {
+        this.game.getConnectionInfo().setJoined(this.data);
+        this.controller.triggerEvent(EventType.ConnectionInfoChanged);
+    }
+
+    public undo() {
+    }
+}
+
+export class SetServerStatus extends AbstractCommand {
+    private status: string;
+    private message: string;
+
+    public constructor(status: string, message: string) {
+        super();
+        this.status = status;
+        this.message = message;
+        this.triggerModelChanged = false;
+    }
+
+    public do() {
+        this.game.getConnectionInfo().setServerStatus(this.status, this.message);
+        this.controller.triggerEvent(EventType.ConnectionInfoChanged);
+    }
+
+    public undo() {
+    }
+}
+
+export class SetServerVersion extends AbstractCommand {
+    private serverVersion: string;
+    private clientVersion: string;
+
+    public constructor(serverVersion: string, clientVersion: string) {
+        super();
+        this.serverVersion = serverVersion;
+        this.clientVersion = clientVersion;
+        this.triggerModelChanged = false;
+    }
+
+    public do() {
+        this.game.getConnectionInfo().setServerVersion(this.serverVersion, this.clientVersion);
+        this.controller.triggerEvent(EventType.ConnectionInfoChanged);
+    }
+
+    public undo() {
+    }
+}
+
+export class SetPasswordChallengeIssued extends AbstractCommand {
+    public constructor() {
+        super();
+        this.triggerModelChanged = false;
+    }
+
+    public do() {
+        this.game.getConnectionInfo().setPasswordChallengeIssued(true);
+        this.controller.triggerEvent(EventType.ConnectionInfoChanged);
+    }
+
+    public undo() {
+    }
+}
+
 export class KickoffResult extends AbstractCommand {
     private roll: number[];
     private result: string;

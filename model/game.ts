@@ -17,6 +17,8 @@ export class Game {
 
     private playerLocations: {[key: string]: Model.Player};
 
+    public connectionInfo: Model.ConnectionInfo;
+
     /**
      * Root internal model class.
      *
@@ -29,6 +31,11 @@ export class Game {
         this.sidePlaying = Model.Side.Home;
         this.half = 0;
         this.playerLocations = {};
+        this.connectionInfo = new Model.ConnectionInfo();
+    }
+
+    public getConnectionInfo(): Model.ConnectionInfo {
+        return this.connectionInfo;
     }
 
     public initialize(data: FFB.Protocol.Messages.ServerGameState) {

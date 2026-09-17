@@ -80,7 +80,7 @@ export class Player extends Layers.Abstract {
         for (let player of this.game.getPlayers()) {
             if (player) {
                 player.icon.setScale(iconScale);
-                player.icon.setScaleMode(Phaser.ScaleModes.NEAREST);
+                player.icon.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
             }
         }        
     }

@@ -5,6 +5,7 @@ export enum EventType {
     BlockDice,
     Click,
     Connected,
+    ConnectionInfoChanged,
     FloatText,
     FullScreen,
     Initialized,
