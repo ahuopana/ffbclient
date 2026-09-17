@@ -75,16 +75,37 @@ next high-value thing to try.
         (new, covers the new `Coordinate.toArray()` used for outbound field-coordinate payloads),
         `tests/commands/{addplayer,zapplayer,unzapplayer,removeplayer}.test.ts`, and additions to
         `tests/model/clientcommands.test.ts`. New shared fixtures in `tests/fixtures.ts`. All passing.
-- [ ] Add handlers (in `commandhandler.ts` + `commands/*.ts`) and `ffb/protocol.d.ts` types for the
-      remaining ~45 unhandled `SERVER_*` commands (`serverTeamList`, `serverGameList`,
-      `serverUserSettings`, the sketch commands, replay commands, `serverAdminMessage`, `serverPong`,
-      `serverAutomaticPlayerMarkings`, `serverUpdateLocalPlayerMarkers`, and the in-play gameplay
-      commands — block/move/pass/foul/skill-use/etc.). Cross-reference each against its
-      `../ffb/ffb-common/.../net/commands/ServerCommand*.java` class for the payload shape.
-- [ ] Implement the remaining outbound `CLIENT_*` commands beyond `clientJoin`/`clientTalk`/
+- [x] **`SERVER_*` handler coverage is now complete** — all 32 commands in `NetCommandId.java` have a
+      client-side handler (`core/commandhandler.ts` registers all 32; verified by diffing against a
+      fresh `grep -oE '\bSERVER_[A-Z_]+\b' NetCommandId.java`). Added in four batches (each committed
+      separately on `dev-ui`), all with `ffb/protocol.d.ts` types cross-referenced against the matching
+      `../ffb/ffb-common/.../net/commands/ServerCommand*.java` class and unit tests:
+      - Lobby/login (`serverLeave`, `serverTeamList`, `serverGameList`, `serverUserSettings`,
+        `serverTeamSetupList`): extend `Model.ConnectionInfo`, same theme as the existing join-handshake
+        state (see `ClientStateLogin.handleCommand` in `ffb-client-logic`, which switches on all of
+        these together).
+      - Sketches — the coach telestrator/drawing tool (`serverAddSketches`, `serverRemoveSketches`,
+        `serverSketchAddCoordinate`, `serverSketchSetColor`, `serverSketchSetLabel`,
+        `serverClearSketches`, `serverSetPreventSketching`): new `Model.Game.sketches` state. Note the
+        wire protocol has two different `FieldCoordinate` JSON shapes — the `[x, y]` array form used
+        almost everywhere (`Coordinate`), and a `{x, y}` object form used only for a sketch's own path
+        points (`FieldCoordinateXY`), because the server serializes those two cases through different
+        Java methods.
+      - Player markers (`serverUpdateLocalPlayerMarkers`, `serverAutomaticPlayerMarkings`):
+        `Model.Player` gained `homeMarkerText`/`awayMarkerText`.
+      - Replay/misc (`serverReplay`, `serverReplayStatus`, `serverReplayControl`, `serverPong`,
+        `serverAdminMessage`): new `Model.ReplayInfo` (mirrors `ConnectionInfo`'s pattern) for playback
+        status/control. `serverReplay` batches historical commands, each with its own `netCommandId` —
+        rather than storing them, they're re-dispatched through the exact same `CommandHandler` pipeline
+        a live command would go through (`Controller` now holds a `CommandHandler` reference for this).
+      **None of this has rendering/UI yet** (sketches aren't drawn, markers aren't shown, replay has no
+      playback controls) — same protocol-then-UI split as the pregame set above. That's P3 work.
+- [ ] Implement the remaining in-play gameplay `CLIENT_*` commands beyond `clientJoin`/`clientTalk`/
       `clientRequestVersion`/`clientCloseSession`/the pregame set above — starting with whatever
       `../ffb/ffb-client-logic`'s `ClientState` classes need for basic input (`clientMove`,
-      `clientEndTurn`, `clientBlock`, ...).
+      `clientEndTurn`, `clientBlock`, ...). This is genuinely the bulk of what's left: `SERVER_*` handler
+      coverage being complete only means the client can now observe/track everything the server sends;
+      actually *playing* a turn (not just spectating) still needs these.
 
 ## P3 — feature build-out
 
