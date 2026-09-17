@@ -4,3 +4,7 @@ export { CommandGameTime } from "./gametime";
 export { CommandModelSync } from "./modelsync";
 export { CommandServerTalk } from "./servertalk";
 export { CommandServerSound } from "./serversound";
+export { CommandJoin } from "./join";
+export { CommandStatus } from "./status";
+export { CommandVersion } from "./version";
+export { CommandPasswordChallenge } from "./passwordchallenge";

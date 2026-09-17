@@ -1,8 +1,14 @@
 module.exports = {
+    "testEnvironment": "jsdom",
     "transform": {
-        "^.+\\.tsx?$": "ts-jest"
+        "^.+\\.tsx?$": ["ts-jest", {
+            tsconfig: {
+                module: "commonjs",
+                moduleResolution: "node"
+            }
+        }]
     },
-    "testRegex": "/tests/.*\.test\.tsx?$",
+    "testRegex": "/tests/.*\\.test\\.tsx?$",
     "moduleFileExtensions": [
         "ts",
         "tsx",

@@ -734,4 +734,30 @@ declare namespace FFB.Protocol.Messages {
     interface ServerSound extends ServerCommand {
         sound: string;
     }
+
+    interface ServerJoin extends NetCommand {
+        coach: string;
+        clientMode: string;
+        playerNames: string[];
+        spectatorNames: string[];
+        spectators: number;
+        name: string;
+    }
+
+    interface ServerStatus extends NetCommand {
+        serverStatus: string;
+        message: string;
+    }
+
+    interface ServerVersion extends NetCommand {
+        serverVersion: string;
+        clientVersion: string;
+        clientPropertyNames: string[];
+        clientPropertyValues: string[];
+        testing: boolean;
+    }
+
+    interface ServerPasswordChallenge extends NetCommand {
+        challenge: string;
+    }
 }

@@ -13,6 +13,10 @@ export class CommandHandler {
             "serverGameTime": new Commands.CommandGameTime(controller),
             "serverTalk": new Commands.CommandServerTalk(controller),
             "serverSound": new Commands.CommandServerSound(controller),
+            "serverJoin": new Commands.CommandJoin(controller),
+            "serverStatus": new Commands.CommandStatus(controller),
+            "serverVersion": new Commands.CommandVersion(controller),
+            "serverPasswordChallenge": new Commands.CommandPasswordChallenge(controller),
         };
         this.network = network;
         this.controller = controller;

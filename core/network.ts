@@ -13,10 +13,14 @@ export class Network {
     public connect(commandHandler: any, config: any) {
         this.config = config;
 
-        let host = window.location.host;
-        host = host.startsWith("localhost") || host.startsWith("192.168") ? "dev.fumbbl.com" : host;
-        let proto = window.location.protocol == 'https:' ? 'wss:' : 'ws:';
-        let port = proto == 'wss:' ? 22224 : 22223;
+        // FFB_SERVER_* are injected at build time (see webpack.config.js) so a dev/test
+        // deployment can point at a local server instead of dev.fumbbl.com.
+        let host = process.env.FFB_SERVER_HOST || window.location.host;
+        if (!process.env.FFB_SERVER_HOST && (host.startsWith("localhost") || host.startsWith("192.168"))) {
+            host = "dev.fumbbl.com";
+        }
+        let proto = process.env.FFB_SERVER_PROTO || (window.location.protocol == 'https:' ? 'wss:' : 'ws:');
+        let port = process.env.FFB_SERVER_PORT ? parseInt(process.env.FFB_SERVER_PORT, 10) : (proto == 'wss:' ? 22224 : 22223);
 
         console.log("Connecting to "+proto+"//"+host+":"+port);
 
