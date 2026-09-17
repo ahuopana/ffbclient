@@ -1025,6 +1025,40 @@ export class SetPreventSketching extends AbstractCommand {
     }
 }
 
+export class UpdatePlayerMarkers extends AbstractCommand {
+    private markers: FFB.Protocol.Messages.PlayerMarkerType[];
+
+    public constructor(data: FFB.Protocol.Messages.ServerUpdateLocalPlayerMarkers) {
+        super();
+        this.markers = data.playerMarkerArray || [];
+    }
+
+    public do() {
+        this.game.updatePlayerMarkers(this.markers);
+    }
+
+    public undo() {
+    }
+}
+
+export class SetAutomaticPlayerMarkings extends AbstractCommand {
+    private index: number;
+    private markings: {[playerId: string]: string};
+
+    public constructor(data: FFB.Protocol.Messages.ServerAutomaticPlayerMarkings) {
+        super();
+        this.index = data.selectedIndex;
+        this.markings = data.markings;
+    }
+
+    public do() {
+        this.game.setAutomaticPlayerMarkings(this.index, this.markings);
+    }
+
+    public undo() {
+    }
+}
+
 export class KickoffResult extends AbstractCommand {
     private roll: number[];
     private result: string;

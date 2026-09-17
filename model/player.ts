@@ -63,6 +63,8 @@ export class Player {
     private portrait: string;
     private skills: string[];
     private zapped: boolean;
+    private homeMarkerText: string;
+    private awayMarkerText: string;
 
     public constructor(team: Model.Team, data: FFB.Protocol.Messages.PlayerType) {
         this.team = team;
@@ -92,6 +94,19 @@ export class Player {
 
     public setZapped(zapped: boolean) {
         this.zapped = zapped;
+    }
+
+    public setMarkerText(homeText: string, awayText: string) {
+        this.homeMarkerText = homeText;
+        this.awayMarkerText = awayText;
+    }
+
+    public getHomeMarkerText(): string {
+        return this.homeMarkerText;
+    }
+
+    public getAwayMarkerText(): string {
+        return this.awayMarkerText;
     }
 
     public getSkills(): string[] {

@@ -24,3 +24,5 @@ export { CommandSketchSetColor } from "./sketchsetcolor";
 export { CommandSketchSetLabel } from "./sketchsetlabel";
 export { CommandClearSketches } from "./clearsketches";
 export { CommandSetPreventSketching } from "./setpreventsketching";
+export { CommandUpdateLocalPlayerMarkers } from "./updatelocalplayermarkers";
+export { CommandAutomaticPlayerMarkings } from "./automaticplayermarkings";

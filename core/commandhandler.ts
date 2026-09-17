@@ -33,6 +33,8 @@ export class CommandHandler {
             "serverSketchSetLabel": new Commands.CommandSketchSetLabel(controller),
             "serverClearSketches": new Commands.CommandClearSketches(controller),
             "serverSetPreventSketching": new Commands.CommandSetPreventSketching(controller),
+            "serverUpdateLocalPlayerMarkers": new Commands.CommandUpdateLocalPlayerMarkers(controller),
+            "serverAutomaticPlayerMarkings": new Commands.CommandAutomaticPlayerMarkings(controller),
         };
         this.network = network;
         this.controller = controller;

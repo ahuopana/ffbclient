@@ -22,6 +22,8 @@ export class Game {
     private sketches: {[id: string]: FFB.Protocol.Messages.SketchType};
     private preventSketching: boolean;
 
+    private automaticPlayerMarkings: {index: number, markings: {[playerId: string]: string}};
+
     /**
      * Root internal model class.
      *
@@ -37,6 +39,7 @@ export class Game {
         this.connectionInfo = new Model.ConnectionInfo();
         this.sketches = {};
         this.preventSketching = false;
+        this.automaticPlayerMarkings = null;
     }
 
     public getConnectionInfo(): Model.ConnectionInfo {
@@ -209,6 +212,23 @@ export class Game {
 
     public setPreventSketching(prevent: boolean) {
         this.preventSketching = prevent;
+    }
+
+    public updatePlayerMarkers(markers: FFB.Protocol.Messages.PlayerMarkerType[]) {
+        for (let marker of markers) {
+            let player = this.getPlayer(marker.playerId);
+            if (player) {
+                player.setMarkerText(marker.homeText, marker.awayText);
+            }
+        }
+    }
+
+    public setAutomaticPlayerMarkings(index: number, markings: {[playerId: string]: string}) {
+        this.automaticPlayerMarkings = { index: index, markings: markings };
+    }
+
+    public getAutomaticPlayerMarkings(): {index: number, markings: {[playerId: string]: string}} {
+        return this.automaticPlayerMarkings;
     }
 
     public getPlayingSide(): Model.Side {
