@@ -1,4 +1,3 @@
-//import * as WebSocket from "ws";
 import LZString from "lz-string";
 
 export class Network {

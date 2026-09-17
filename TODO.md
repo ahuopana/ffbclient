@@ -80,8 +80,11 @@ next high-value thing to try.
       also propose changes upstream to `christerk/ffbclient`.
 - [ ] Revisit webpack vs. Vite (kept webpack, just upgraded to v5, for now — Vite would align tooling
       with the sibling `FUMBBLUI` repo).
-- [ ] Confirm whether the `ws`/`@types/ws` devDependencies are actually needed anywhere (currently
-      unused — `core/network.ts` uses the browser's global `WebSocket`, not the `ws` package).
+- [x] Confirm whether the `ws`/`@types/ws` devDependencies are actually needed anywhere — confirmed
+      unused (`core/network.ts` uses the browser's global `WebSocket`; the `ws` import there was already
+      commented out) and removed, along with the dead commented-out import. They remain in
+      `node_modules` only as transitive deps of `jest-environment-jsdom`/`webpack-dev-server`.
+      `package-lock.json` regenerated; `npm test`/`tsc --noEmit`/`npm run build` still pass.
 
 ## P5 — nice to have
 
