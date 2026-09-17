@@ -760,6 +760,66 @@ export class SetPasswordChallengeIssued extends AbstractCommand {
     }
 }
 
+export class AddPlayer extends AbstractCommand {
+    private data: FFB.Protocol.Messages.ServerAddPlayer;
+
+    public constructor(data: FFB.Protocol.Messages.ServerAddPlayer) {
+        super();
+        this.data = data;
+    }
+
+    public do() {
+        let team = this.game.getTeamById(this.data.teamId);
+        if (team) {
+            let player = team.addPlayer(this.data.player);
+            player.setState(this.data.playerState);
+        }
+    }
+
+    public undo() {
+    }
+}
+
+export class RemovePlayer extends AbstractCommand {
+    private playerId: string;
+
+    public constructor(data: FFB.Protocol.Messages.ServerRemovePlayer) {
+        super();
+        this.playerId = data.playerId;
+    }
+
+    public do() {
+        this.game.removePlayer(this.playerId);
+    }
+
+    public undo() {
+    }
+}
+
+export class SetPlayerZapped extends AbstractCommand {
+    private teamId: string;
+    private playerId: string;
+    private zapped: boolean;
+
+    public constructor(data: FFB.Protocol.Messages.ServerZapPlayer | FFB.Protocol.Messages.ServerUnzapPlayer, zapped: boolean) {
+        super();
+        this.teamId = data.teamId;
+        this.playerId = data.playerId;
+        this.zapped = zapped;
+    }
+
+    public do() {
+        let team = this.game.getTeamById(this.teamId);
+        let player = team ? team.getPlayer(this.playerId) : null;
+        if (player) {
+            player.setZapped(this.zapped);
+        }
+    }
+
+    public undo() {
+    }
+}
+
 export class KickoffResult extends AbstractCommand {
     private roll: number[];
     private result: string;

@@ -8,3 +8,7 @@ export { CommandJoin } from "./join";
 export { CommandStatus } from "./status";
 export { CommandVersion } from "./version";
 export { CommandPasswordChallenge } from "./passwordchallenge";
+export { CommandAddPlayer } from "./addplayer";
+export { CommandZapPlayer } from "./zapplayer";
+export { CommandUnzapPlayer } from "./unzapplayer";
+export { CommandRemovePlayer } from "./removeplayer";

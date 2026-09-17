@@ -62,6 +62,7 @@ export class Player {
     private gameSpp: number;
     private portrait: string;
     private skills: string[];
+    private zapped: boolean;
 
     public constructor(team: Model.Team, data: FFB.Protocol.Messages.PlayerType) {
         this.team = team;
@@ -78,10 +79,19 @@ export class Player {
         this.skills = data.skillArray;
 
         this.state = PlayerState.Unknown;
+        this.zapped = false;
     }
 
     public getId(): string {
         return this.id;
+    }
+
+    public isZapped(): boolean {
+        return this.zapped;
+    }
+
+    public setZapped(zapped: boolean) {
+        this.zapped = zapped;
     }
 
     public getSkills(): string[] {

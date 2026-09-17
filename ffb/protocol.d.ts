@@ -760,4 +760,27 @@ declare namespace FFB.Protocol.Messages {
     interface ServerPasswordChallenge extends NetCommand {
         challenge: string;
     }
+
+    interface ServerAddPlayer extends ServerCommand {
+        teamId: string;
+        player: PlayerType;
+        playerState: PlayerState;
+        sendToBoxReason: SendToBoxReason;
+        sendToBoxTurn: number;
+        sendToBoxHalf: number;
+    }
+
+    interface ServerZapPlayer extends ServerCommand {
+        teamId: string;
+        playerId: string;
+    }
+
+    interface ServerUnzapPlayer extends ServerCommand {
+        teamId: string;
+        playerId: string;
+    }
+
+    interface ServerRemovePlayer extends ServerCommand {
+        playerId: string;
+    }
 }

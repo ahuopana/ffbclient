@@ -108,6 +108,26 @@ export class Controller {
         }
     }
 
+    public sendSetupPlayer(playerId: string, coordinate: Types.Coordinate) {
+        this.network.sendSetupPlayer(playerId, coordinate);
+    }
+
+    public sendStartGame() {
+        this.network.sendStartGame();
+    }
+
+    public sendCoinChoice(choiceHeads: boolean) {
+        this.network.sendCoinChoice(choiceHeads);
+    }
+
+    public sendReceiveChoice(choiceReceive: boolean) {
+        this.network.sendReceiveChoice(choiceReceive);
+    }
+
+    public sendKickoff(coordinate: Types.Coordinate) {
+        this.network.sendKickoff(coordinate);
+    }
+
     public triggerEvent(eventType: Types.EventType, data?: any) {
         this.handleEvent(eventType, data);
         this.eventListeners.forEach((listener) => listener.handleEvent(eventType, data));

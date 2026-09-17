@@ -135,6 +135,24 @@ export class Game {
         return player;
     }
 
+    public getTeamById(teamId: string): Model.Team {
+        if (this.teamHome.getId() == teamId) {
+            return this.teamHome;
+        }
+        if (this.teamAway.getId() == teamId) {
+            return this.teamAway;
+        }
+        return null;
+    }
+
+    public removePlayer(playerId: string) {
+        if (this.teamHome.getPlayer(playerId)) {
+            this.teamHome.removePlayer(playerId);
+        } else if (this.teamAway.getPlayer(playerId)) {
+            this.teamAway.removePlayer(playerId);
+        }
+    }
+
     public getPlayingSide(): Model.Side {
         return this.sidePlaying;
     }

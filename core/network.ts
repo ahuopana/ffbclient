@@ -1,4 +1,5 @@
 import LZString from "lz-string";
+import { Coordinate } from "../types";
 
 export class Network {
     private ws: WebSocket;
@@ -77,6 +78,51 @@ export class Network {
             netCommandId: "clientCloseSession"
         };
         this.send(requestVersionMessage);
+    }
+
+    public sendSetupPlayer(playerId: string, coordinate: Coordinate) {
+        let message = {
+            netCommandId: 'clientSetupPlayer',
+            playerId: playerId,
+            coordinate: coordinate.toArray(),
+        };
+
+        this.send(message);
+    }
+
+    public sendStartGame() {
+        let message = {
+            netCommandId: 'clientStartGame',
+        };
+
+        this.send(message);
+    }
+
+    public sendCoinChoice(choiceHeads: boolean) {
+        let message = {
+            netCommandId: 'clientCoinChoice',
+            choiceHeads: choiceHeads,
+        };
+
+        this.send(message);
+    }
+
+    public sendReceiveChoice(choiceReceive: boolean) {
+        let message = {
+            netCommandId: 'clientReceiveChoice',
+            choiceReceive: choiceReceive,
+        };
+
+        this.send(message);
+    }
+
+    public sendKickoff(coordinate: Coordinate) {
+        let message = {
+            netCommandId: 'clientKickoff',
+            ballCoordinate: coordinate.toArray(),
+        };
+
+        this.send(message);
     }
 
     private send(data: any) {

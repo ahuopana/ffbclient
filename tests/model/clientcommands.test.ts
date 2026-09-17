@@ -2,6 +2,7 @@ import * as Model from '../../model';
 import * as Core from '../../core';
 import * as ClientCommands from '../../model/clientcommands';
 import { EventType } from '../../types/eventlistener';
+import { makeGameWithTeams, makeTeamData, makePlayerData } from '../fixtures';
 
 function makeControllerMock() {
     return {
@@ -129,5 +130,129 @@ describe('SetPasswordChallengeIssued', () => {
         command.apply(game, controller);
 
         expect(controller.triggerEvent).toHaveBeenCalledWith(EventType.ConnectionInfoChanged);
+    });
+});
+
+describe('AddPlayer', () => {
+    test('adds the player to the team named in the message', () => {
+        let game = makeGameWithTeams('home', 'away');
+        let controller = makeControllerMock();
+
+        let data: FFB.Protocol.Messages.ServerAddPlayer = {
+            netCommandId: 'serverAddPlayer',
+            commandNr: 1,
+            teamId: 'away',
+            player: makePlayerData('newplayer'),
+            playerState: 9,
+            sendToBoxReason: null,
+            sendToBoxTurn: 0,
+            sendToBoxHalf: 0,
+        };
+
+        let command = new ClientCommands.AddPlayer(data);
+        command.apply(game, controller);
+
+        let player = game.teamAway.getPlayer('newplayer');
+        expect(player).toBeDefined();
+        expect(player.getState()).toBe(9);
+        expect(game.teamHome.getPlayer('newplayer')).toBeUndefined();
+    });
+
+    test('does nothing when the team id does not match either team', () => {
+        let game = makeGameWithTeams('home', 'away');
+        let controller = makeControllerMock();
+
+        let data: FFB.Protocol.Messages.ServerAddPlayer = {
+            netCommandId: 'serverAddPlayer',
+            commandNr: 1,
+            teamId: 'nonexistent',
+            player: makePlayerData('newplayer'),
+            playerState: 0,
+            sendToBoxReason: null,
+            sendToBoxTurn: 0,
+            sendToBoxHalf: 0,
+        };
+
+        let command = new ClientCommands.AddPlayer(data);
+        expect(() => command.apply(game, controller)).not.toThrow();
+        expect(game.getPlayer('newplayer')).toBeUndefined();
+    });
+});
+
+describe('RemovePlayer', () => {
+    test('removes the player from whichever team has it', () => {
+        let game = new Model.Game();
+        game.teamHome = new Model.Team(game, makeTeamData('home', [makePlayerData('p1')]));
+        game.teamAway = new Model.Team(game, makeTeamData('away'));
+        let controller = makeControllerMock();
+
+        let data: FFB.Protocol.Messages.ServerRemovePlayer = {
+            netCommandId: 'serverRemovePlayer',
+            commandNr: 1,
+            playerId: 'p1',
+        };
+
+        let command = new ClientCommands.RemovePlayer(data);
+        command.apply(game, controller);
+
+        expect(game.getPlayer('p1')).toBeUndefined();
+    });
+});
+
+describe('SetPlayerZapped', () => {
+    test('marks the player zapped', () => {
+        let game = new Model.Game();
+        game.teamHome = new Model.Team(game, makeTeamData('home', [makePlayerData('p1')]));
+        game.teamAway = new Model.Team(game, makeTeamData('away'));
+        let controller = makeControllerMock();
+
+        let data: FFB.Protocol.Messages.ServerZapPlayer = {
+            netCommandId: 'serverZapPlayer',
+            commandNr: 1,
+            teamId: 'home',
+            playerId: 'p1',
+        };
+
+        let command = new ClientCommands.SetPlayerZapped(data, true);
+        command.apply(game, controller);
+
+        expect(game.getPlayer('p1').isZapped()).toBe(true);
+    });
+
+    test('clears the zapped flag', () => {
+        let game = new Model.Game();
+        game.teamHome = new Model.Team(game, makeTeamData('home', [makePlayerData('p1')]));
+        game.teamAway = new Model.Team(game, makeTeamData('away'));
+        game.getPlayer('p1').setZapped(true);
+        let controller = makeControllerMock();
+
+        let data: FFB.Protocol.Messages.ServerUnzapPlayer = {
+            netCommandId: 'serverUnzapPlayer',
+            commandNr: 1,
+            teamId: 'home',
+            playerId: 'p1',
+        };
+
+        let command = new ClientCommands.SetPlayerZapped(data, false);
+        command.apply(game, controller);
+
+        expect(game.getPlayer('p1').isZapped()).toBe(false);
+    });
+
+    test('does nothing when the team id does not match either team', () => {
+        let game = new Model.Game();
+        game.teamHome = new Model.Team(game, makeTeamData('home', [makePlayerData('p1')]));
+        game.teamAway = new Model.Team(game, makeTeamData('away'));
+        let controller = makeControllerMock();
+
+        let data: FFB.Protocol.Messages.ServerZapPlayer = {
+            netCommandId: 'serverZapPlayer',
+            commandNr: 1,
+            teamId: 'nonexistent',
+            playerId: 'p1',
+        };
+
+        let command = new ClientCommands.SetPlayerZapped(data, true);
+        expect(() => command.apply(game, controller)).not.toThrow();
     });
 });

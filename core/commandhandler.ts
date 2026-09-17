@@ -17,6 +17,10 @@ export class CommandHandler {
             "serverStatus": new Commands.CommandStatus(controller),
             "serverVersion": new Commands.CommandVersion(controller),
             "serverPasswordChallenge": new Commands.CommandPasswordChallenge(controller),
+            "serverAddPlayer": new Commands.CommandAddPlayer(controller),
+            "serverZapPlayer": new Commands.CommandZapPlayer(controller),
+            "serverUnzapPlayer": new Commands.CommandUnzapPlayer(controller),
+            "serverRemovePlayer": new Commands.CommandRemovePlayer(controller),
         };
         this.network = network;
         this.controller = controller;

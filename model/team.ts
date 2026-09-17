@@ -2,6 +2,7 @@ import * as Model from ".";
 
 export class Team {
     private game: Model.Game;
+    private id: string;
     private coach: string;
     private name: string;
     private roster: Model.Roster;
@@ -13,6 +14,7 @@ export class Team {
 
     public constructor(game: Model.Game, data: FFB.Protocol.Messages.TeamType) {
         this.game = game;
+        this.id = data.teamId;
         this.name = data.teamName;
         this.roster = new Model.Roster(data.roster);
 
@@ -27,6 +29,10 @@ export class Team {
 
     public get Game(): Model.Game {
         return this.game;
+    }
+
+    public getId() {
+        return this.id;
     }
 
     public getName() {
@@ -92,5 +98,15 @@ export class Team {
 
     public getPlayer(id: string) {
         return this.players[id];
+    }
+
+    public addPlayer(data: FFB.Protocol.Messages.PlayerType): Model.Player {
+        let player = new Model.Player(this, data);
+        this.players[player.getId()] = player;
+        return player;
+    }
+
+    public removePlayer(id: string) {
+        delete this.players[id];
     }
 }

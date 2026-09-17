@@ -55,16 +55,36 @@ next high-value thing to try.
 
 ## P2 — protocol/command parity (the bulk of the remaining work)
 
+- [x] The pregame/kickoff command set needed to get a fresh game started, as distinct from in-play
+      gameplay commands (traced through `ffb-client-logic`'s `ClientState`/`LogicModule` classes to
+      confirm scope — the setup→coin-toss→kickoff phase transitions themselves ride on the existing
+      `serverGameState`/`serverModelSync` handlers via `Game.turnMode`, no separate command needed for
+      those):
+      - Outbound `CLIENT_*` (in `core/network.ts` + `core/controller.ts`): `clientSetupPlayer`,
+        `clientStartGame`, `clientCoinChoice`, `clientReceiveChoice`, `clientKickoff`. Not yet wired to
+        any UI (no setup drag-and-drop, coin-toss dialog, or kickoff-placement click handler exists in
+        `scenes/*` yet) — that's P3 work, driven by the same `ClientState` classes.
+      - Inbound `SERVER_*` (in `commands/*.ts` + `model/clientcommands.ts`): `serverAddPlayer`,
+        `serverZapPlayer`, `serverUnzapPlayer`, `serverRemovePlayer`. `Model.Team` gained
+        `addPlayer`/`removePlayer`/`getId`, `Model.Game` gained `getTeamById`/`removePlayer`.
+        Simplification: the reference client swaps a roster player for a distinct `ZappedPlayer` type on
+        zap (and back on unzap); `ffbclient` doesn't have team-roster-selection UI yet to consume that
+        distinction, so `Model.Player` just gained a `zapped` boolean flag instead — revisit if/when a
+        roster-selection screen is built.
+      - Unit tests: `tests/model/team.test.ts`, `tests/model/game.test.ts` (new), `tests/types/coordinate.test.ts`
+        (new, covers the new `Coordinate.toArray()` used for outbound field-coordinate payloads),
+        `tests/commands/{addplayer,zapplayer,unzapplayer,removeplayer}.test.ts`, and additions to
+        `tests/model/clientcommands.test.ts`. New shared fixtures in `tests/fixtures.ts`. All passing.
 - [ ] Add handlers (in `commandhandler.ts` + `commands/*.ts`) and `ffb/protocol.d.ts` types for the
-      remaining ~50 unhandled `SERVER_*` commands (`serverTeamList`, `serverGameList`,
-      `serverUserSettings`, `serverAddPlayer`/`ZapPlayer`/`UnzapPlayer`/`RemovePlayer`, the sketch
-      commands, replay commands, `serverAdminMessage`, `serverPong`, `serverAutomaticPlayerMarkings`,
-      `serverUpdateLocalPlayerMarkers`). Cross-reference each against its
+      remaining ~45 unhandled `SERVER_*` commands (`serverTeamList`, `serverGameList`,
+      `serverUserSettings`, the sketch commands, replay commands, `serverAdminMessage`, `serverPong`,
+      `serverAutomaticPlayerMarkings`, `serverUpdateLocalPlayerMarkers`, and the in-play gameplay
+      commands — block/move/pass/foul/skill-use/etc.). Cross-reference each against its
       `../ffb/ffb-common/.../net/commands/ServerCommand*.java` class for the payload shape.
-- [ ] Implement outbound `CLIENT_*` commands beyond `clientJoin`/`clientTalk`/`clientRequestVersion`/
-      `clientCloseSession` (currently all in `core/network.ts`) — starting with whatever
-      `../ffb/ffb-client-logic`'s `ClientState` classes need for basic input (`clientSetupPlayer`,
-      `clientMove`, `clientEndTurn`, `clientKickoff`, ...).
+- [ ] Implement the remaining outbound `CLIENT_*` commands beyond `clientJoin`/`clientTalk`/
+      `clientRequestVersion`/`clientCloseSession`/the pregame set above — starting with whatever
+      `../ffb/ffb-client-logic`'s `ClientState` classes need for basic input (`clientMove`,
+      `clientEndTurn`, `clientBlock`, ...).
 
 ## P3 — feature build-out
 

@@ -12,8 +12,12 @@ export class Coordinate {
         if (arr == null) {
             return null;
         }
-        
+
         return new Coordinate(arr[0], arr[1]);
+    }
+
+    public toArray(): number[] {
+        return [this.x, this.y];
     }
 
     public isOnField(): boolean {
