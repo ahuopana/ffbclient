@@ -19,6 +19,9 @@ export class Game {
 
     public connectionInfo: Model.ConnectionInfo;
 
+    private sketches: {[id: string]: FFB.Protocol.Messages.SketchType};
+    private preventSketching: boolean;
+
     /**
      * Root internal model class.
      *
@@ -32,6 +35,8 @@ export class Game {
         this.half = 0;
         this.playerLocations = {};
         this.connectionInfo = new Model.ConnectionInfo();
+        this.sketches = {};
+        this.preventSketching = false;
     }
 
     public getConnectionInfo(): Model.ConnectionInfo {
@@ -151,6 +156,59 @@ export class Game {
         } else if (this.teamAway.getPlayer(playerId)) {
             this.teamAway.removePlayer(playerId);
         }
+    }
+
+    public getSketches(): {[id: string]: FFB.Protocol.Messages.SketchType} {
+        return this.sketches;
+    }
+
+    public addSketches(sketches: FFB.Protocol.Messages.SketchType[]) {
+        for (let sketch of sketches) {
+            this.sketches[sketch.id] = sketch;
+        }
+    }
+
+    public removeSketches(ids: string[]) {
+        for (let id of ids) {
+            delete this.sketches[id];
+        }
+    }
+
+    public clearSketches() {
+        this.sketches = {};
+    }
+
+    public sketchAddCoordinate(id: string, coordinate: Coordinate) {
+        let sketch = this.sketches[id];
+        if (sketch) {
+            sketch.fieldCoordinates.push({x: coordinate.x, y: coordinate.y});
+        }
+    }
+
+    public setSketchColor(ids: string[], rgb: number) {
+        for (let id of ids) {
+            let sketch = this.sketches[id];
+            if (sketch) {
+                sketch.rgb = rgb;
+            }
+        }
+    }
+
+    public setSketchLabel(ids: string[], text: string) {
+        for (let id of ids) {
+            let sketch = this.sketches[id];
+            if (sketch) {
+                sketch.text = text;
+            }
+        }
+    }
+
+    public isSketchingPrevented(): boolean {
+        return this.preventSketching;
+    }
+
+    public setPreventSketching(prevent: boolean) {
+        this.preventSketching = prevent;
     }
 
     public getPlayingSide(): Model.Side {

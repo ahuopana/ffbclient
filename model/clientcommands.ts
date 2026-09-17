@@ -910,6 +910,121 @@ export class SetPlayerZapped extends AbstractCommand {
     }
 }
 
+export class AddSketches extends AbstractCommand {
+    private sketches: FFB.Protocol.Messages.SketchType[];
+
+    public constructor(data: FFB.Protocol.Messages.ServerAddSketches) {
+        super();
+        this.sketches = data.sketches;
+    }
+
+    public do() {
+        this.game.addSketches(this.sketches);
+    }
+
+    public undo() {
+    }
+}
+
+export class RemoveSketches extends AbstractCommand {
+    private ids: string[];
+
+    public constructor(data: FFB.Protocol.Messages.ServerRemoveSketches) {
+        super();
+        this.ids = data.ids || [];
+    }
+
+    public do() {
+        this.game.removeSketches(this.ids);
+    }
+
+    public undo() {
+    }
+}
+
+export class SketchAddCoordinate extends AbstractCommand {
+    private id: string;
+    private coordinate: Coordinate;
+
+    public constructor(data: FFB.Protocol.Messages.ServerSketchAddCoordinate) {
+        super();
+        this.id = data.id;
+        this.coordinate = Coordinate.FromArray(data.coordinate);
+    }
+
+    public do() {
+        this.game.sketchAddCoordinate(this.id, this.coordinate);
+    }
+
+    public undo() {
+    }
+}
+
+export class SetSketchColor extends AbstractCommand {
+    private ids: string[];
+    private rgb: number;
+
+    public constructor(data: FFB.Protocol.Messages.ServerSketchSetColor) {
+        super();
+        this.ids = data.ids;
+        this.rgb = data.rgb;
+    }
+
+    public do() {
+        this.game.setSketchColor(this.ids, this.rgb);
+    }
+
+    public undo() {
+    }
+}
+
+export class SetSketchLabel extends AbstractCommand {
+    private ids: string[];
+    private text: string;
+
+    public constructor(data: FFB.Protocol.Messages.ServerSketchSetLabel) {
+        super();
+        this.ids = data.ids;
+        this.text = data.text;
+    }
+
+    public do() {
+        this.game.setSketchLabel(this.ids, this.text);
+    }
+
+    public undo() {
+    }
+}
+
+export class ClearSketches extends AbstractCommand {
+    public constructor() {
+        super();
+    }
+
+    public do() {
+        this.game.clearSketches();
+    }
+
+    public undo() {
+    }
+}
+
+export class SetPreventSketching extends AbstractCommand {
+    private prevent: boolean;
+
+    public constructor(data: FFB.Protocol.Messages.ServerSetPreventSketching) {
+        super();
+        this.prevent = data.prevent;
+    }
+
+    public do() {
+        this.game.setPreventSketching(this.prevent);
+    }
+
+    public undo() {
+    }
+}
+
 export class KickoffResult extends AbstractCommand {
     private roll: number[];
     private result: string;

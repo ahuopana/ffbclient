@@ -26,6 +26,13 @@ export class CommandHandler {
             "serverGameList": new Commands.CommandGameList(controller),
             "serverUserSettings": new Commands.CommandUserSettings(controller),
             "serverTeamSetupList": new Commands.CommandTeamSetupList(controller),
+            "serverAddSketches": new Commands.CommandAddSketches(controller),
+            "serverRemoveSketches": new Commands.CommandRemoveSketches(controller),
+            "serverSketchAddCoordinate": new Commands.CommandSketchAddCoordinate(controller),
+            "serverSketchSetColor": new Commands.CommandSketchSetColor(controller),
+            "serverSketchSetLabel": new Commands.CommandSketchSetLabel(controller),
+            "serverClearSketches": new Commands.CommandClearSketches(controller),
+            "serverSetPreventSketching": new Commands.CommandSetPreventSketching(controller),
         };
         this.network = network;
         this.controller = controller;
