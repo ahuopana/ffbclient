@@ -12,3 +12,8 @@ export { CommandAddPlayer } from "./addplayer";
 export { CommandZapPlayer } from "./zapplayer";
 export { CommandUnzapPlayer } from "./unzapplayer";
 export { CommandRemovePlayer } from "./removeplayer";
+export { CommandLeave } from "./leave";
+export { CommandTeamList } from "./teamlist";
+export { CommandGameList } from "./gamelist";
+export { CommandUserSettings } from "./usersettings";
+export { CommandTeamSetupList } from "./teamsetuplist";

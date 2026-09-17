@@ -783,4 +783,150 @@ declare namespace FFB.Protocol.Messages {
     interface ServerRemovePlayer extends ServerCommand {
         playerId: string;
     }
+
+    type TeamStatus = {
+        name: string;
+    }
+
+    type TeamListEntryType = {
+        teamId:     string;
+        teamStatus: TeamStatus;
+        division:   string;
+        teamName:   string;
+        teamValue:  number;
+        race:       string;
+        treasury:   number;
+    }
+
+    type TeamListType = {
+        coach:           string;
+        teamListEntries: TeamListEntryType[];
+    }
+
+    type GameListEntryType = {
+        gameId:         number;
+        started:        string;
+        teamHomeId:     string;
+        teamHomeName:   string;
+        teamHomeCoach:  string;
+        teamAwayId:     string;
+        teamAwayName:   string;
+        teamAwayCoach:  string;
+    }
+
+    type GameListType = {
+        gameListEntries: GameListEntryType[];
+    }
+
+    type FieldCoordinateXY = {
+        x: number;
+        y: number;
+    }
+
+    type SketchType = {
+        id:                string;
+        rgb:               number;
+        text:              string;
+        fieldCoordinates:  FieldCoordinateXY[];
+    }
+
+    interface ServerLeave extends ServerCommand {
+        coach:          string;
+        clientMode:     string;
+        spectators:     number;
+        spectatorNames: string[];
+    }
+
+    interface ServerTeamList extends ServerCommand {
+        teamList: TeamListType;
+    }
+
+    interface ServerGameList extends ServerCommand {
+        gameList: GameListType;
+    }
+
+    interface ServerUserSettings extends ServerCommand {
+        userSettingNames:  string[];
+        userSettingValues: string[];
+    }
+
+    interface ServerTeamSetupList extends ServerCommand {
+        setupNames: string[];
+    }
+
+    interface ServerAddSketches extends NetCommand {
+        coach:    string;
+        sketches: SketchType[];
+    }
+
+    interface ServerRemoveSketches extends NetCommand {
+        coach: string;
+        ids:   string[];
+    }
+
+    interface ServerSketchAddCoordinate extends NetCommand {
+        coach:      string;
+        id:         string;
+        coordinate: Coordinate;
+    }
+
+    interface ServerSketchSetColor extends NetCommand {
+        coach: string;
+        ids:   string[];
+        rgb:   number;
+    }
+
+    interface ServerSketchSetLabel extends NetCommand {
+        coach: string;
+        ids:   string[];
+        text:  string;
+    }
+
+    interface ServerClearSketches extends NetCommand {
+    }
+
+    interface ServerSetPreventSketching extends NetCommand {
+        coach:   string;
+        prevent: boolean;
+    }
+
+    interface ServerUpdateLocalPlayerMarkers extends ServerCommand {
+        playerMarkerArray: PlayerMarkerType[];
+    }
+
+    interface ServerAutomaticPlayerMarkings extends ServerCommand {
+        markings:      {[playerId: string]: string};
+        selectedIndex: number;
+    }
+
+    interface ServerReplay extends ServerCommand {
+        totalNrOfCommands:      number;
+        commandArray:           NetCommand[];
+        lastCommand:            boolean;
+        markingIntervalIndexes: number[];
+    }
+
+    /**
+     * commandNr here is the replay position being reported, not the usual
+     * ServerCommand envelope sequence number (this command doesn't use that).
+     */
+    interface ServerReplayStatus extends NetCommand {
+        commandNr: number;
+        running:   boolean;
+        forward:   boolean;
+        speed:     number;
+        skip:      boolean;
+    }
+
+    interface ServerReplayControl extends NetCommand {
+        coach: string;
+    }
+
+    interface ServerPong extends NetCommand {
+        timestamp: number;
+    }
+
+    interface ServerAdminMessage extends ServerCommand {
+        messageArray: string[];
+    }
 }

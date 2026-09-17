@@ -21,6 +21,11 @@ export class CommandHandler {
             "serverZapPlayer": new Commands.CommandZapPlayer(controller),
             "serverUnzapPlayer": new Commands.CommandUnzapPlayer(controller),
             "serverRemovePlayer": new Commands.CommandRemovePlayer(controller),
+            "serverLeave": new Commands.CommandLeave(controller),
+            "serverTeamList": new Commands.CommandTeamList(controller),
+            "serverGameList": new Commands.CommandGameList(controller),
+            "serverUserSettings": new Commands.CommandUserSettings(controller),
+            "serverTeamSetupList": new Commands.CommandTeamSetupList(controller),
         };
         this.network = network;
         this.controller = controller;

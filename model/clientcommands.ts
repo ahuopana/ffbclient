@@ -760,6 +760,96 @@ export class SetPasswordChallengeIssued extends AbstractCommand {
     }
 }
 
+export class SetLeft extends AbstractCommand {
+    private data: FFB.Protocol.Messages.ServerLeave;
+
+    public constructor(data: FFB.Protocol.Messages.ServerLeave) {
+        super();
+        this.data = data;
+        this.triggerModelChanged = false;
+    }
+
+    public do() {
+        this.game.getConnectionInfo().setLeft(this.data);
+        this.controller.triggerEvent(EventType.ConnectionInfoChanged);
+    }
+
+    public undo() {
+    }
+}
+
+export class SetTeamList extends AbstractCommand {
+    private data: FFB.Protocol.Messages.ServerTeamList;
+
+    public constructor(data: FFB.Protocol.Messages.ServerTeamList) {
+        super();
+        this.data = data;
+        this.triggerModelChanged = false;
+    }
+
+    public do() {
+        this.game.getConnectionInfo().setTeamList(this.data.teamList ? this.data.teamList.teamListEntries : []);
+        this.controller.triggerEvent(EventType.ConnectionInfoChanged);
+    }
+
+    public undo() {
+    }
+}
+
+export class SetGameList extends AbstractCommand {
+    private data: FFB.Protocol.Messages.ServerGameList;
+
+    public constructor(data: FFB.Protocol.Messages.ServerGameList) {
+        super();
+        this.data = data;
+        this.triggerModelChanged = false;
+    }
+
+    public do() {
+        this.game.getConnectionInfo().setGameList(this.data.gameList ? this.data.gameList.gameListEntries : []);
+        this.controller.triggerEvent(EventType.ConnectionInfoChanged);
+    }
+
+    public undo() {
+    }
+}
+
+export class SetUserSettings extends AbstractCommand {
+    private data: FFB.Protocol.Messages.ServerUserSettings;
+
+    public constructor(data: FFB.Protocol.Messages.ServerUserSettings) {
+        super();
+        this.data = data;
+        this.triggerModelChanged = false;
+    }
+
+    public do() {
+        this.game.getConnectionInfo().setUserSettings(this.data.userSettingNames, this.data.userSettingValues);
+        this.controller.triggerEvent(EventType.ConnectionInfoChanged);
+    }
+
+    public undo() {
+    }
+}
+
+export class SetTeamSetupNames extends AbstractCommand {
+    private data: FFB.Protocol.Messages.ServerTeamSetupList;
+
+    public constructor(data: FFB.Protocol.Messages.ServerTeamSetupList) {
+        super();
+        this.data = data;
+        this.triggerModelChanged = false;
+    }
+
+    public do() {
+        this.game.getConnectionInfo().setTeamSetupNames(this.data.setupNames);
+        this.controller.triggerEvent(EventType.ConnectionInfoChanged);
+    }
+
+    public undo() {
+    }
+}
+
 export class AddPlayer extends AbstractCommand {
     private data: FFB.Protocol.Messages.ServerAddPlayer;
 

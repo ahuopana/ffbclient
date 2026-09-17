@@ -22,6 +22,11 @@ export class ConnectionInfo {
 
     private passwordChallengeIssued: boolean;
 
+    private teamList: FFB.Protocol.Messages.TeamListEntryType[];
+    private gameList: FFB.Protocol.Messages.GameListEntryType[];
+    private userSettings: {[key: string]: string};
+    private teamSetupNames: string[];
+
     public constructor() {
         this.joined = false;
         this.spectators = 0;
@@ -29,6 +34,10 @@ export class ConnectionInfo {
         this.spectatorNames = [];
         this.versionMismatch = false;
         this.passwordChallengeIssued = false;
+        this.teamList = [];
+        this.gameList = [];
+        this.userSettings = {};
+        this.teamSetupNames = [];
     }
 
     public setJoined(data: FFB.Protocol.Messages.ServerJoin) {
@@ -114,5 +123,50 @@ export class ConnectionInfo {
 
     public isPasswordChallengeIssued(): boolean {
         return this.passwordChallengeIssued;
+    }
+
+    /**
+     * A coach or spectator left - updates the same spectator roster
+     * setJoined populates, since that's what changed.
+     */
+    public setLeft(data: FFB.Protocol.Messages.ServerLeave) {
+        this.spectatorNames = data.spectatorNames || [];
+        this.spectators = data.spectators;
+    }
+
+    public setTeamList(teamList: FFB.Protocol.Messages.TeamListEntryType[]) {
+        this.teamList = teamList || [];
+    }
+
+    public getTeamList(): FFB.Protocol.Messages.TeamListEntryType[] {
+        return this.teamList;
+    }
+
+    public setGameList(gameList: FFB.Protocol.Messages.GameListEntryType[]) {
+        this.gameList = gameList || [];
+    }
+
+    public getGameList(): FFB.Protocol.Messages.GameListEntryType[] {
+        return this.gameList;
+    }
+
+    public setUserSettings(names: string[], values: string[]) {
+        let userSettings: {[key: string]: string} = {};
+        for (let i = 0; i < (names || []).length; i++) {
+            userSettings[names[i]] = values[i];
+        }
+        this.userSettings = userSettings;
+    }
+
+    public getUserSettings(): {[key: string]: string} {
+        return this.userSettings;
+    }
+
+    public setTeamSetupNames(setupNames: string[]) {
+        this.teamSetupNames = setupNames || [];
+    }
+
+    public getTeamSetupNames(): string[] {
+        return this.teamSetupNames;
     }
 }
