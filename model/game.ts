@@ -27,6 +27,12 @@ export class Game {
     public replayInfo: Model.ReplayInfo;
     private adminMessages: string[];
 
+    private turnMode: string;
+    private lastTurnMode: string;
+    private dialogParameter: any;
+    private setupOffense: boolean;
+    private waitingForOpponent: boolean;
+
     /**
      * Root internal model class.
      *
@@ -45,6 +51,8 @@ export class Game {
         this.automaticPlayerMarkings = null;
         this.replayInfo = new Model.ReplayInfo();
         this.adminMessages = [];
+        this.setupOffense = false;
+        this.waitingForOpponent = false;
     }
 
     public getReplayInfo(): Model.ReplayInfo {
@@ -248,6 +256,46 @@ export class Game {
         return this.adminMessages;
     }
 
+    public setTurnMode(turnMode: string) {
+        this.turnMode = turnMode;
+    }
+
+    public getTurnMode(): string {
+        return this.turnMode;
+    }
+
+    public setLastTurnMode(turnMode: string) {
+        this.lastTurnMode = turnMode;
+    }
+
+    public getLastTurnMode(): string {
+        return this.lastTurnMode;
+    }
+
+    public setDialogParameter(dialogParameter: any) {
+        this.dialogParameter = dialogParameter;
+    }
+
+    public getDialogParameter(): any {
+        return this.dialogParameter;
+    }
+
+    public setSetupOffense(setupOffense: boolean) {
+        this.setupOffense = setupOffense;
+    }
+
+    public isSetupOffense(): boolean {
+        return this.setupOffense;
+    }
+
+    public setWaitingForOpponent(waitingForOpponent: boolean) {
+        this.waitingForOpponent = waitingForOpponent;
+    }
+
+    public isWaitingForOpponent(): boolean {
+        return this.waitingForOpponent;
+    }
+
     public getPlayingSide(): Model.Side {
         return this.sidePlaying;
     }
@@ -300,6 +348,11 @@ export class Game {
         this.setPlayingSide(data.homePlaying ? Model.Side.Home : Model.Side.Away);
         this.applyTeamTurnData(this.teamHome, data.turnDataHome);
         this.applyTeamTurnData(this.teamAway, data.turnDataAway);
+        this.setTurnMode(data.turnMode ? data.turnMode.name : null);
+        this.setLastTurnMode(data.lastTurnMode ? data.lastTurnMode.name : null);
+        this.setDialogParameter(data.dialogParameter);
+        this.setSetupOffense(data.setupOffense);
+        this.setWaitingForOpponent(data.waitingForOpponent);
     }
 
     private applyTeamTurnData(team: Model.Team, data: FFB.Protocol.Messages.TurnData) {

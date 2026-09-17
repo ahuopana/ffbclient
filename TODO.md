@@ -112,6 +112,30 @@ next high-value thing to try.
 - [ ] Work phase-by-phase through `../ffb/ffb-client-logic`'s `state/` package (one `ClientState` per
       game phase) as the backlog, cross-referenced against `scenes/layers/*` and `scenes/components/*`,
       which already scaffold most of the Phaser-side rendering.
+- [ ] **Wire the pregame outbound commands (P2 above) to actual UI**, staged by complexity (each stage
+      depends on the previous):
+      1. [x] **Model plumbing** — `Game.turnMode`/`lastTurnMode`/`dialogParameter`/`setupOffense`/
+             `waitingForOpponent` were tracked nowhere (the `gameSetTurnMode`/`gameSetDialogParameter`/etc.
+             `serverModelSync` changes were silently logged as "Unhandled model change" and dropped).
+             This is the actual prerequisite for every other stage below, since the reference client
+             decides which pregame prompt to show purely from `Game.turnMode` +
+             `Game.dialogParameter.id`/`.value` (see `ClientStateId`/`ClientState` classes in
+             `ffb-client-logic`) — there's no dedicated "show setup now" command. Added the 5
+             `gameSetXxx` handlers to `commands/modelsync.ts`, matching `Model.Game` fields +
+             getters/setters, and a new `EventType.TurnModeChanged` (fired on turn-mode/dialog-parameter
+             changes specifically, so future UI doesn't have to filter noisy generic `ModelChanged`
+             events). Unit tests in `tests/model/game.test.ts`, `tests/model/clientcommands.test.ts`,
+             and a new `tests/commands/modelsync.test.ts` (the latter didn't exist before — covers only
+             the 5 new handlers, not full retroactive coverage of the pre-existing ones in that file).
+      2. [ ] Kickoff placement — click-to-place ball + `clientKickoff` when `turnMode == "kickoff"`.
+             Simplest remaining stage (reuses `MainScene`'s existing pointer-interaction pattern).
+      3. [ ] Coin toss dialog — heads/tails then kick/receive buttons, triggered by
+             `dialogParameter.id.name` being `COIN_TOSS_CHOICE`/`RECEIVE_CHOICE` (see
+             `DialogCoinChoiceParameter`/`DialogReceiveChoiceParameter` in `ffb/protocol.d.ts`). First
+             new dialog UI component — no reusable dialog framework exists in `scenes/components/*` yet.
+      4. [ ] Start game button — trivial confirm button, `clientStartGame`.
+      5. [ ] Team setup drag-and-drop — placing reserves onto the field, `clientSetupPlayer` per
+             placement. Most complex; deliberately last.
 
 ## P4 — infra/tooling hardening
 

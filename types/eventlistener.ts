@@ -14,7 +14,8 @@ export enum EventType {
     Quit,
     Resized,
     Resizing,
-    ToggleDugouts
+    ToggleDugouts,
+    TurnModeChanged
 }
 
 export interface EventListener {

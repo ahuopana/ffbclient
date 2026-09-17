@@ -24,6 +24,11 @@ export class CommandModelSync extends Command {
             "teamResultSetScore": this.handleSetScore,
             "gameSetHomePlaying": this.handleSetHomePlaying,
             "turnDataSetTurnNr": this.handleSetTurnNr,
+            "gameSetTurnMode": this.handleSetTurnMode,
+            "gameSetLastTurnMode": this.handleSetLastTurnMode,
+            "gameSetDialogParameter": this.handleSetDialogParameter,
+            "gameSetSetupOffense": this.handleSetSetupOffense,
+            "gameSetWaitingForOpponent": this.handleSetWaitingForOpponent,
         };
 
         this.reportHandlers = {
@@ -135,6 +140,28 @@ export class CommandModelSync extends Command {
         let side = change.modelChangeKey;
         let turn = <number>change.modelChangeValue;
         return new ClientCommands.SetTurnNr(side, turn);
+    }
+
+    private handleSetTurnMode(change: FFB.Protocol.Messages.ModelChangeType): ClientCommands.AbstractCommand {
+        let value = <FFB.Protocol.Messages.TurnMode>change.modelChangeValue;
+        return new ClientCommands.SetTurnMode(value ? value.name : null);
+    }
+
+    private handleSetLastTurnMode(change: FFB.Protocol.Messages.ModelChangeType): ClientCommands.AbstractCommand {
+        let value = <FFB.Protocol.Messages.TurnMode>change.modelChangeValue;
+        return new ClientCommands.SetLastTurnMode(value ? value.name : null);
+    }
+
+    private handleSetDialogParameter(change: FFB.Protocol.Messages.ModelChangeType): ClientCommands.AbstractCommand {
+        return new ClientCommands.SetDialogParameter(change.modelChangeValue);
+    }
+
+    private handleSetSetupOffense(change: FFB.Protocol.Messages.ModelChangeType): ClientCommands.AbstractCommand {
+        return new ClientCommands.SetSetupOffense(<boolean>change.modelChangeValue);
+    }
+
+    private handleSetWaitingForOpponent(change: FFB.Protocol.Messages.ModelChangeType): ClientCommands.AbstractCommand {
+        return new ClientCommands.SetWaitingForOpponent(<boolean>change.modelChangeValue);
     }
 
     private handleSetScore(change: FFB.Protocol.Messages.ModelChangeType): ClientCommands.AbstractCommand {

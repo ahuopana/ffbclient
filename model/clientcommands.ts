@@ -1146,6 +1146,125 @@ export class AddAdminMessages extends AbstractCommand {
     }
 }
 
+export class SetTurnMode extends AbstractCommand {
+    private turnMode: string;
+    private oldTurnMode: string;
+
+    public constructor(turnMode: string) {
+        super();
+        this.turnMode = turnMode;
+    }
+
+    public init(game: Model.Game, controller: Core.Controller) {
+        super.init(game, controller);
+        this.oldTurnMode = game.getTurnMode();
+    }
+
+    public do() {
+        this.game.setTurnMode(this.turnMode);
+        this.controller.triggerEvent(EventType.TurnModeChanged);
+    }
+
+    public undo() {
+        this.game.setTurnMode(this.oldTurnMode);
+        this.controller.triggerEvent(EventType.TurnModeChanged);
+    }
+}
+
+export class SetLastTurnMode extends AbstractCommand {
+    private turnMode: string;
+    private oldTurnMode: string;
+
+    public constructor(turnMode: string) {
+        super();
+        this.turnMode = turnMode;
+    }
+
+    public init(game: Model.Game, controller: Core.Controller) {
+        super.init(game, controller);
+        this.oldTurnMode = game.getLastTurnMode();
+    }
+
+    public do() {
+        this.game.setLastTurnMode(this.turnMode);
+    }
+
+    public undo() {
+        this.game.setLastTurnMode(this.oldTurnMode);
+    }
+}
+
+export class SetDialogParameter extends AbstractCommand {
+    private dialogParameter: any;
+    private oldDialogParameter: any;
+
+    public constructor(dialogParameter: any) {
+        super();
+        this.dialogParameter = dialogParameter;
+    }
+
+    public init(game: Model.Game, controller: Core.Controller) {
+        super.init(game, controller);
+        this.oldDialogParameter = game.getDialogParameter();
+    }
+
+    public do() {
+        this.game.setDialogParameter(this.dialogParameter);
+        this.controller.triggerEvent(EventType.TurnModeChanged);
+    }
+
+    public undo() {
+        this.game.setDialogParameter(this.oldDialogParameter);
+        this.controller.triggerEvent(EventType.TurnModeChanged);
+    }
+}
+
+export class SetSetupOffense extends AbstractCommand {
+    private setupOffense: boolean;
+    private oldSetupOffense: boolean;
+
+    public constructor(setupOffense: boolean) {
+        super();
+        this.setupOffense = setupOffense;
+    }
+
+    public init(game: Model.Game, controller: Core.Controller) {
+        super.init(game, controller);
+        this.oldSetupOffense = game.isSetupOffense();
+    }
+
+    public do() {
+        this.game.setSetupOffense(this.setupOffense);
+    }
+
+    public undo() {
+        this.game.setSetupOffense(this.oldSetupOffense);
+    }
+}
+
+export class SetWaitingForOpponent extends AbstractCommand {
+    private waitingForOpponent: boolean;
+    private oldWaitingForOpponent: boolean;
+
+    public constructor(waitingForOpponent: boolean) {
+        super();
+        this.waitingForOpponent = waitingForOpponent;
+    }
+
+    public init(game: Model.Game, controller: Core.Controller) {
+        super.init(game, controller);
+        this.oldWaitingForOpponent = game.isWaitingForOpponent();
+    }
+
+    public do() {
+        this.game.setWaitingForOpponent(this.waitingForOpponent);
+    }
+
+    public undo() {
+        this.game.setWaitingForOpponent(this.oldWaitingForOpponent);
+    }
+}
+
 export class KickoffResult extends AbstractCommand {
     private roll: number[];
     private result: string;

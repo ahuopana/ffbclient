@@ -40,4 +40,46 @@ describe('Game', () => {
             expect(() => game.removePlayer('nonexistent')).not.toThrow();
         });
     });
+
+    describe('turnMode / dialogParameter tracking', () => {
+        test('turnMode round-trips', () => {
+            let game = new Model.Game();
+            game.setTurnMode('kickoff');
+
+            expect(game.getTurnMode()).toBe('kickoff');
+        });
+
+        test('lastTurnMode round-trips', () => {
+            let game = new Model.Game();
+            game.setLastTurnMode('setup');
+
+            expect(game.getLastTurnMode()).toBe('setup');
+        });
+
+        test('dialogParameter round-trips', () => {
+            let game = new Model.Game();
+            let dialogParameter = { dialogId: { name: 'COIN_TOSS_CHOICE' } };
+            game.setDialogParameter(dialogParameter);
+
+            expect(game.getDialogParameter()).toBe(dialogParameter);
+        });
+
+        test('setupOffense defaults to false and round-trips', () => {
+            let game = new Model.Game();
+            expect(game.isSetupOffense()).toBe(false);
+
+            game.setSetupOffense(true);
+
+            expect(game.isSetupOffense()).toBe(true);
+        });
+
+        test('waitingForOpponent defaults to false and round-trips', () => {
+            let game = new Model.Game();
+            expect(game.isWaitingForOpponent()).toBe(false);
+
+            game.setWaitingForOpponent(true);
+
+            expect(game.isWaitingForOpponent()).toBe(true);
+        });
+    });
 });

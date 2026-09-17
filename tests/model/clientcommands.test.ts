@@ -256,3 +256,125 @@ describe('SetPlayerZapped', () => {
         expect(() => command.apply(game, controller)).not.toThrow();
     });
 });
+
+describe('SetTurnMode', () => {
+    test('sets the turn mode and triggers TurnModeChanged', () => {
+        let game = new Model.Game();
+        let controller = makeControllerMock();
+
+        let command = new ClientCommands.SetTurnMode('kickoff');
+        command.apply(game, controller);
+
+        expect(game.getTurnMode()).toBe('kickoff');
+        expect(controller.triggerEvent).toHaveBeenCalledWith(EventType.TurnModeChanged);
+    });
+
+    test('undo restores the previous turn mode', () => {
+        let game = new Model.Game();
+        game.setTurnMode('setup');
+        let controller = makeControllerMock();
+
+        let command = new ClientCommands.SetTurnMode('kickoff');
+        command.apply(game, controller);
+        command.undo();
+
+        expect(game.getTurnMode()).toBe('setup');
+    });
+});
+
+describe('SetLastTurnMode', () => {
+    test('sets the last turn mode', () => {
+        let game = new Model.Game();
+        let controller = makeControllerMock();
+
+        let command = new ClientCommands.SetLastTurnMode('regular');
+        command.apply(game, controller);
+
+        expect(game.getLastTurnMode()).toBe('regular');
+    });
+
+    test('undo restores the previous last turn mode', () => {
+        let game = new Model.Game();
+        game.setLastTurnMode('setup');
+        let controller = makeControllerMock();
+
+        let command = new ClientCommands.SetLastTurnMode('regular');
+        command.apply(game, controller);
+        command.undo();
+
+        expect(game.getLastTurnMode()).toBe('setup');
+    });
+});
+
+describe('SetDialogParameter', () => {
+    test('sets the dialog parameter and triggers TurnModeChanged', () => {
+        let game = new Model.Game();
+        let controller = makeControllerMock();
+        let dialogParameter = { dialogId: { name: 'COIN_TOSS_CHOICE' } };
+
+        let command = new ClientCommands.SetDialogParameter(dialogParameter);
+        command.apply(game, controller);
+
+        expect(game.getDialogParameter()).toBe(dialogParameter);
+        expect(controller.triggerEvent).toHaveBeenCalledWith(EventType.TurnModeChanged);
+    });
+
+    test('undo restores the previous dialog parameter', () => {
+        let game = new Model.Game();
+        let oldParameter = { dialogId: { name: 'JOIN' } };
+        game.setDialogParameter(oldParameter);
+        let controller = makeControllerMock();
+
+        let command = new ClientCommands.SetDialogParameter({ dialogId: { name: 'COIN_TOSS_CHOICE' } });
+        command.apply(game, controller);
+        command.undo();
+
+        expect(game.getDialogParameter()).toBe(oldParameter);
+    });
+});
+
+describe('SetSetupOffense', () => {
+    test('sets setupOffense', () => {
+        let game = new Model.Game();
+        let controller = makeControllerMock();
+
+        let command = new ClientCommands.SetSetupOffense(true);
+        command.apply(game, controller);
+
+        expect(game.isSetupOffense()).toBe(true);
+    });
+
+    test('undo restores the previous value', () => {
+        let game = new Model.Game();
+        let controller = makeControllerMock();
+
+        let command = new ClientCommands.SetSetupOffense(true);
+        command.apply(game, controller);
+        command.undo();
+
+        expect(game.isSetupOffense()).toBe(false);
+    });
+});
+
+describe('SetWaitingForOpponent', () => {
+    test('sets waitingForOpponent', () => {
+        let game = new Model.Game();
+        let controller = makeControllerMock();
+
+        let command = new ClientCommands.SetWaitingForOpponent(true);
+        command.apply(game, controller);
+
+        expect(game.isWaitingForOpponent()).toBe(true);
+    });
+
+    test('undo restores the previous value', () => {
+        let game = new Model.Game();
+        let controller = makeControllerMock();
+
+        let command = new ClientCommands.SetWaitingForOpponent(true);
+        command.apply(game, controller);
+        command.undo();
+
+        expect(game.isWaitingForOpponent()).toBe(false);
+    });
+});
