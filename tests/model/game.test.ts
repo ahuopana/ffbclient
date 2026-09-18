@@ -82,4 +82,69 @@ describe('Game', () => {
             expect(game.isWaitingForOpponent()).toBe(true);
         });
     });
+
+    describe('getPregameStatusText', () => {
+        test('returns null outside any pregame phase', () => {
+            let game = new Model.Game();
+            game.setTurnMode('regular');
+
+            expect(game.getPregameStatusText()).toBeNull();
+        });
+
+        test('returns null when nothing has been set yet', () => {
+            let game = new Model.Game();
+
+            expect(game.getPregameStatusText()).toBeNull();
+        });
+
+        test('reports team setup', () => {
+            let game = new Model.Game();
+            game.setTurnMode('setup');
+
+            expect(game.getPregameStatusText()).toBe('Setting up teams...');
+        });
+
+        test('reports the start-game phase', () => {
+            let game = new Model.Game();
+            game.setTurnMode('startGame');
+
+            expect(game.getPregameStatusText()).toBe('Starting game...');
+        });
+
+        test('reports kickoff', () => {
+            let game = new Model.Game();
+            game.setTurnMode('kickoff');
+
+            expect(game.getPregameStatusText()).toBe('Kicking off...');
+        });
+
+        test('reports the coin toss regardless of turn mode', () => {
+            let game = new Model.Game();
+            game.setTurnMode('startGame');
+            game.setDialogParameter({ id: { name: 'COIN_TOSS_CHOICE' }, value: { dialogId: { name: 'COIN_TOSS_CHOICE' } } });
+
+            expect(game.getPregameStatusText()).toBe('Coin toss...');
+        });
+
+        test('reports the receive choice with the choosing team\'s name', () => {
+            let game = makeGameWithTeams('home', 'away');
+            game.setTurnMode('startGame');
+            game.setDialogParameter({
+                id: { name: 'RECEIVE_CHOICE' },
+                value: { dialogId: { name: 'RECEIVE_CHOICE' }, teamId: 'away' },
+            });
+
+            expect(game.getPregameStatusText()).toBe('Team away is choosing to kick or receive...');
+        });
+
+        test('falls back to a generic label when the receive choice team is unknown', () => {
+            let game = makeGameWithTeams('home', 'away');
+            game.setDialogParameter({
+                id: { name: 'RECEIVE_CHOICE' },
+                value: { dialogId: { name: 'RECEIVE_CHOICE' }, teamId: 'nonexistent' },
+            });
+
+            expect(game.getPregameStatusText()).toBe('A team is choosing to kick or receive...');
+        });
+    });
 });

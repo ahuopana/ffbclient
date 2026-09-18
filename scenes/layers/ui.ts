@@ -20,6 +20,7 @@ export class UI implements Types.EventListener {
     private playerCard: Comp.PlayerCard;
 
     private debugText: Comp.Label;
+    private statusText: Comp.Label;
 
     private component: Comp.BorderPanel;
 
@@ -153,6 +154,26 @@ export class UI implements Types.EventListener {
             text: "",
         });
 
+        this.statusText = new Comp.Label({
+            id: "StatusText",
+            height: 1,
+            anchor: Comp.Anchor.NORTH,
+            parentAnchor: Comp.Anchor.NORTH,
+            margin: {
+                top: 1.2,
+            },
+            padding: {
+                left: 0.3,
+                right: 0.3,
+            },
+            background: 0x0,
+            backgroundAlpha: 0.4,
+            color: 0xffffff,
+            text: "",
+            visible: false,
+            inheritVisibility: false,
+        });
+
         this.component = new Comp.BorderPanel({
             id: "RootPanel",
             width: "100%",
@@ -192,6 +213,7 @@ export class UI implements Types.EventListener {
 
                 this.input,
                 this.playerCard,
+                this.statusText,
             ]
         });
 
@@ -223,6 +245,12 @@ export class UI implements Types.EventListener {
         this.debugText.setText(text);
     }
 
+    private updateStatusText() {
+        let text = this.controller.Game.getPregameStatusText();
+        this.statusText.setText(text);
+        this.statusText.setVisible(text != null);
+    }
+
     public setPlayerCard(player: Model.Player, pos?: number[], sz?: number[]) {
         if (player == null) {
             this.playerCard.setVisible(false);
@@ -251,6 +279,11 @@ export class UI implements Types.EventListener {
             let turn = "T" + g.teamHome.getTurn() + "/" + g.teamAway.getTurn();
             this.labelHalf.setText(half);
             this.labelTurn.setText(turn);
+
+            this.updateStatusText();
+        }
+        if (eventType == Types.EventType.TurnModeChanged) {
+            this.updateStatusText();
         }
     }
 

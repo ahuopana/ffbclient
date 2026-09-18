@@ -127,15 +127,40 @@ next high-value thing to try.
              events). Unit tests in `tests/model/game.test.ts`, `tests/model/clientcommands.test.ts`,
              and a new `tests/commands/modelsync.test.ts` (the latter didn't exist before — covers only
              the 5 new handlers, not full retroactive coverage of the pre-existing ones in that file).
-      2. [ ] Kickoff placement — click-to-place ball + `clientKickoff` when `turnMode == "kickoff"`.
-             Simplest remaining stage (reuses `MainScene`'s existing pointer-interaction pattern).
-      3. [ ] Coin toss dialog — heads/tails then kick/receive buttons, triggered by
-             `dialogParameter.id.name` being `COIN_TOSS_CHOICE`/`RECEIVE_CHOICE` (see
-             `DialogCoinChoiceParameter`/`DialogReceiveChoiceParameter` in `ffb/protocol.d.ts`). First
-             new dialog UI component — no reusable dialog framework exists in `scenes/components/*` yet.
-      4. [ ] Start game button — trivial confirm button, `clientStartGame`.
-      5. [ ] Team setup drag-and-drop — placing reserves onto the field, `clientSetupPlayer` per
-             placement. Most complex; deliberately last.
+      **Reframed after stage 1** (important finding): `core/network.ts`'s `join()` hardcodes
+      `clientMode: 'spectator'`. The reference client's own `ClientStateFactory.getStateForGame()`
+      short-circuits to `ClientStateId.SPECTATE` for any spectator *before* ever looking at
+      `turnMode`/`dialogParameter` — those are only turned into an interactive prompt for the specific
+      coach whose turn it is (and that coach's `Game.teamHome`/`teamAway` arrive pre-swapped by the
+      server via `Game.transform()` so "home" always means "my team" — see `ServerCommunication
+      .sendAwaySession(..., gameStateCommand.transform())` server-side). So the 5 outbound pregame
+      commands (`clientSetupPlayer`/`clientStartGame`/`clientCoinChoice`/`clientReceiveChoice`/
+      `clientKickoff`) can't actually be reached or usefully triggered by ffbclient as it stands today —
+      building clickable controls for them would be dead code. Decided (with the user) to reframe
+      stages 2+ as **passive spectator status text** instead of interactive controls, matching
+      ffbclient's actual current capability and near-term goal (P1: watch a game in progress). Revisit
+      building the interactive versions if/when ffbclient gains a real player-mode join flow (its own
+      undertaking — needs login/team-selection UI and the home/away transform-awareness above).
+      2. [x] **Spectator status text for the pregame phases** — `Game.getPregameStatusText()` (pure,
+             unit-tested model method) turns `turnMode`/`dialogParameter` into a one-line label ("Setting
+             up teams...", "Coin toss...", "`<Team>` is choosing to kick or receive...", "Kicking
+             off...", null outside those phases). Wired into `Layers.UI` as a new `statusText` label
+             (banner near the top of the field, hidden when null), refreshed on `TurnModeChanged` and on
+             the initial `ModelChanged` right after connecting (so joining mid-phase shows it
+             immediately, not just on the next change). **Not visually verified** — reaching `MainScene`
+             needs a real match connection, which needs both a live `ffb-server` (not available in this
+             sandbox) and bypassing `index.html`'s jQuery/Bootstrap-CDN lobby flow (`../ffb`'s own
+             instructions say local dev needs internet access for those CDN scripts, which this sandbox
+             also doesn't have) — confirmed by actually trying: the dev server serves the page fine, but
+             `$ is not defined` since the CDN scripts can't load, so the lobby's "click a match" handler
+             (the only thing that constructs the Phaser `App`) never runs. `tsc --noEmit`, `npm run
+             build`, and the unit tests (which cover `Game.getPregameStatusText()` directly, bypassing
+             Phaser) all pass.
+      3. [ ] Team setup / roster rendering — show reserves/on-field player counts and who's setting up,
+             during `turnMode == "setup"`. No interaction (spectator).
+      4. [ ] Revisit as interactive controls once/if a player-mode join flow exists (see reframing note
+             above) — kickoff placement, coin toss buttons, start-game button, team setup drag-and-drop,
+             in roughly that complexity order.
 
 ## P4 — infra/tooling hardening
 

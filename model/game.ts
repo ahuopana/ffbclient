@@ -296,6 +296,39 @@ export class Game {
         return this.waitingForOpponent;
     }
 
+    /**
+     * A one-line, human-readable status for the pregame phases (team setup,
+     * coin toss, kickoff), for a spectator's benefit - null outside those
+     * phases. ffbclient only ever joins as a spectator (see core/network.ts),
+     * so this is informational text, not a prompt for the viewer to act on;
+     * the reference client only shows those as an interactive prompt to the
+     * specific coach whose turn it is.
+     */
+    public getPregameStatusText(): string {
+        let dialogId = (this.dialogParameter && this.dialogParameter.id) ? this.dialogParameter.id.name : null;
+
+        if (dialogId == "COIN_TOSS_CHOICE") {
+            return "Coin toss...";
+        }
+
+        if (dialogId == "RECEIVE_CHOICE") {
+            let value = this.dialogParameter.value;
+            let team = (value && value.teamId) ? this.getTeamById(value.teamId) : null;
+            return (team ? team.getName() : "A team") + " is choosing to kick or receive...";
+        }
+
+        switch (this.turnMode) {
+            case "setup":
+                return "Setting up teams...";
+            case "startGame":
+                return "Starting game...";
+            case "kickoff":
+                return "Kicking off...";
+            default:
+                return null;
+        }
+    }
+
     public getPlayingSide(): Model.Side {
         return this.sidePlaying;
     }
