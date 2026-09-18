@@ -156,8 +156,17 @@ next high-value thing to try.
              (the only thing that constructs the Phaser `App`) never runs. `tsc --noEmit`, `npm run
              build`, and the unit tests (which cover `Game.getPregameStatusText()` directly, bypassing
              Phaser) all pass.
-      3. [ ] Team setup / roster rendering — show reserves/on-field player counts and who's setting up,
-             during `turnMode == "setup"`. No interaction (spectator).
+      3. [x] **Team setup / roster progress text** — extended `getPregameStatusText()`'s `"setup"` case
+             (traced server-side semantics in `StepSetup.java`/`StepEndTurn.java`: both teams set up in
+             turn via `Game.sidePlaying`/`homePlaying`, defense first then offense per `setupOffense`)
+             to name the team currently setting up, its role, and on-field progress, e.g. "Team away is
+             setting up (defense) - 1/2 on the field...". Added `Team.getPlayerCount`/`getOnFieldCount`
+             and `Game.getTeamBySide` to support it. Also fixed a latent null-pointer risk this surfaced:
+             `Player.isOnField()` crashed on a player with no location yet (e.g. one added via
+             `serverAddPlayer` mid-game, before any field-model update names its coordinate) - now
+             null-safe. New `tests/model/player.test.ts` (didn't exist before), plus additions to
+             `tests/model/team.test.ts` and `tests/model/game.test.ts`. `tsc`/`build`/unit tests pass;
+             same "can't visually verify without a live server" caveat as stage 2.
       4. [ ] Revisit as interactive controls once/if a player-mode join flow exists (see reframing note
              above) — kickoff placement, coin toss buttons, start-game button, team setup drag-and-drop,
              in roughly that complexity order.

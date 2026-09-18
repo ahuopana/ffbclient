@@ -109,4 +109,22 @@ export class Team {
     public removePlayer(id: string) {
         delete this.players[id];
     }
+
+    public getPlayerCount(): number {
+        let count = 0;
+        for (let id in this.players) {
+            count++;
+        }
+        return count;
+    }
+
+    public getOnFieldCount(): number {
+        let count = 0;
+        for (let id in this.players) {
+            if (this.players[id].isOnField()) {
+                count++;
+            }
+        }
+        return count;
+    }
 }

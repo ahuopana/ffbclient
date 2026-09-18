@@ -319,7 +319,7 @@ export class Game {
 
         switch (this.turnMode) {
             case "setup":
-                return "Setting up teams...";
+                return this.getSetupStatusText();
             case "startGame":
                 return "Starting game...";
             case "kickoff":
@@ -329,12 +329,33 @@ export class Game {
         }
     }
 
+    /**
+     * The team named here is whichever team the server currently has
+     * mid-setup (sidePlaying, per applyTurnData/gameSetHomePlaying - both
+     * teams set up in turn, defense first then offense - see setupOffense).
+     */
+    private getSetupStatusText(): string {
+        let settingUpTeam = this.getTeamBySide(this.sidePlaying);
+        if (!settingUpTeam) {
+            return "Setting up teams...";
+        }
+
+        let role = this.setupOffense ? "offense" : "defense";
+        let onField = settingUpTeam.getOnFieldCount();
+        let total = settingUpTeam.getPlayerCount();
+        return settingUpTeam.getName() + " is setting up (" + role + ") - " + onField + "/" + total + " on the field...";
+    }
+
     public getPlayingSide(): Model.Side {
         return this.sidePlaying;
     }
 
     public setPlayingSide(side: Model.Side) {
         this.sidePlaying = side;
+    }
+
+    public getTeamBySide(side: Model.Side): Model.Team {
+        return side == Model.Side.Home ? this.teamHome : this.teamAway;
     }
 
     public getHalf(): number {

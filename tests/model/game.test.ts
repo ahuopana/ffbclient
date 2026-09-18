@@ -1,4 +1,5 @@
 import * as Model from '../../model';
+import { Coordinate } from '../../types/coordinate';
 import { makeGameWithTeams, makeTeamData, makePlayerData } from '../fixtures';
 
 describe('Game', () => {
@@ -19,6 +20,20 @@ describe('Game', () => {
             let game = makeGameWithTeams('home', 'away');
 
             expect(game.getTeamById('nonexistent')).toBeNull();
+        });
+    });
+
+    describe('getTeamBySide', () => {
+        test('returns the home team for Side.Home', () => {
+            let game = makeGameWithTeams('home', 'away');
+
+            expect(game.getTeamBySide(Model.Side.Home)).toBe(game.teamHome);
+        });
+
+        test('returns the away team for Side.Away', () => {
+            let game = makeGameWithTeams('home', 'away');
+
+            expect(game.getTeamBySide(Model.Side.Away)).toBe(game.teamAway);
         });
     });
 
@@ -97,11 +112,32 @@ describe('Game', () => {
             expect(game.getPregameStatusText()).toBeNull();
         });
 
-        test('reports team setup', () => {
+        test('reports a generic setup message when no team is resolvable', () => {
             let game = new Model.Game();
             game.setTurnMode('setup');
 
             expect(game.getPregameStatusText()).toBe('Setting up teams...');
+        });
+
+        test('reports which team is setting up, its role, and on-field progress', () => {
+            let game = makeGameWithTeams('home', 'away');
+            game.setTurnMode('setup');
+            game.setPlayingSide(Model.Side.Away);
+            game.setSetupOffense(false);
+            game.teamAway.addPlayer(makePlayerData('p1'));
+            game.teamAway.addPlayer(makePlayerData('p2'));
+            game.getPlayer('p1').setLocation(new Coordinate(3, 3));
+
+            expect(game.getPregameStatusText()).toBe('Team away is setting up (defense) - 1/2 on the field...');
+        });
+
+        test('reports the offense role during the second setup pass', () => {
+            let game = makeGameWithTeams('home', 'away');
+            game.setTurnMode('setup');
+            game.setPlayingSide(Model.Side.Home);
+            game.setSetupOffense(true);
+
+            expect(game.getPregameStatusText()).toBe('Team home is setting up (offense) - 0/0 on the field...');
         });
 
         test('reports the start-game phase', () => {

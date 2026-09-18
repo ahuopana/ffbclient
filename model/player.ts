@@ -177,7 +177,7 @@ export class Player {
     }
 
     public isOnField(): boolean {
-        return this.coordinate.isOnField();
+        return this.coordinate != null && this.coordinate.isOnField();
     }
 
     public getAssets() {
