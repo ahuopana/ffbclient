@@ -2,6 +2,34 @@ import LZString from "lz-string";
 import { Coordinate } from "../types";
 import { createChallengeResponse } from "./passwordchallenge";
 
+/**
+ * Applies a server entered in the login form ("host", "host:port", or a full
+ * "ws://host:port"/"wss://host:port") over the build-time default, so one
+ * static build (e.g. a GitHub Pages preview) can point at any ffb-server
+ * without rebuilding.
+ */
+export function applyServerOverride(server: string, target: { host: string, port: number, proto: string }) {
+    if (!server) {
+        return target;
+    }
+
+    let value = server.trim();
+    let schemeMatch = value.match(/^(wss?:)\/\/(.+)$/);
+    let proto = target.proto;
+    if (schemeMatch) {
+        proto = schemeMatch[1];
+        value = schemeMatch[2];
+    }
+
+    let [serverHost, serverPort] = value.split(':');
+
+    return {
+        host: serverHost || target.host,
+        port: serverPort ? parseInt(serverPort, 10) : target.port,
+        proto: proto,
+    };
+}
+
 export class Network {
     private ws: WebSocket;
     private config: any;
@@ -22,6 +50,8 @@ export class Network {
         }
         let proto = process.env.FFB_SERVER_PROTO || (window.location.protocol == 'https:' ? 'wss:' : 'ws:');
         let port = process.env.FFB_SERVER_PORT ? parseInt(process.env.FFB_SERVER_PORT, 10) : (proto == 'wss:' ? 22224 : 22223);
+
+        ({ host, port, proto } = applyServerOverride(config.server, { host, port, proto }));
 
         console.log("Connecting to "+proto+"//"+host+":"+port);
 

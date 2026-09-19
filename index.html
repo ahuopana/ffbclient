@@ -55,6 +55,11 @@
 
 <body>
     <div id="login">
+        <label>
+            Server
+            <input type="text" id="login-server" placeholder="host:port (leave blank for default)">
+        </label>
+
         <h2>Join a game</h2>
         <form id="login-form">
             <label>
@@ -109,8 +114,23 @@
     <script>
         var wrapper = document.getElementById('wrapper');
         var loginPage = document.getElementById('login');
+        var serverField = document.getElementById('login-server');
+
+        try {
+            serverField.value = localStorage.getItem('ffb_server') || '';
+        } catch (e) {
+            // localStorage unavailable (e.g. private browsing) - just leave the field blank.
+        }
 
         function startApp(mode) {
+            var server = serverField.value.trim();
+            try {
+                localStorage.setItem('ffb_server', server);
+            } catch (e) {
+                // Ignore - the server just won't be remembered next time.
+            }
+
+            wrapper.setAttribute('server', server);
             wrapper.setAttribute('mode', mode);
             loginPage.style.display = 'none';
             wrapper.style.display = 'block';
