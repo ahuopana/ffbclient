@@ -41,8 +41,19 @@ module.exports = {
             devServer.app.get("/matches", (req, res) => {
                 api.get_current_matches(res);
             });
-            devServer.app.get("/auth", (req, res) => {
-                api.authenticate(res);
+            devServer.app.post("/auth", (req, res) => {
+                let body = '';
+                req.on('data', (chunk) => body += chunk);
+                req.on('end', () => {
+                    let credentials;
+                    try {
+                        credentials = JSON.parse(body || '{}');
+                    } catch (e) {
+                        res.status(400).json({ error: "Invalid JSON body" });
+                        return;
+                    }
+                    api.authenticate(res, credentials);
+                });
             });
             return middlewares;
         }

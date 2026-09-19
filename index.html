@@ -32,8 +32,23 @@
             display: inline;
         }
 
-        #login-error {
+        #login-error,
+        #fumbbl-error {
             color: #f66;
+        }
+
+        #match-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        #match-list li {
+            padding: 6px 0;
+            border-bottom: 1px solid #444;
+        }
+
+        #match-list a {
+            color: #8cf;
         }
     </style>
 </head>
@@ -63,6 +78,28 @@
             <p id="login-error"></p>
             <button type="submit">Connect</button>
         </form>
+
+        <hr>
+
+        <h2>FUMBBL login</h2>
+        <form id="fumbbl-form">
+            <label>
+                FUMBBL user ID
+                <input type="text" id="fumbbl-user-id">
+            </label>
+            <label>
+                Client ID
+                <input type="text" id="fumbbl-client-id">
+            </label>
+            <label>
+                Client Secret
+                <input type="password" id="fumbbl-client-secret">
+            </label>
+            <p id="fumbbl-error"></p>
+            <button type="submit">Log in with FUMBBL</button>
+        </form>
+
+        <ul id="match-list"></ul>
     </div>
 
     <div class="phaserapppage" id="wrapper" style="display: none">
@@ -70,27 +107,99 @@
     </div>
 
     <script>
-        document.getElementById('login-form').addEventListener('submit', function (event) {
-            event.preventDefault();
+        var wrapper = document.getElementById('wrapper');
+        var loginPage = document.getElementById('login');
 
-            var coach = document.getElementById('login-coach').value;
-            var password = document.getElementById('login-password').value;
-            var gameId = document.getElementById('login-gameid').value;
-            var mode = document.querySelector('input[name=login-mode]:checked').value;
-
-            var wrapper = document.getElementById('wrapper');
-            wrapper.setAttribute('user', coach);
-            wrapper.setAttribute('password', password);
-            wrapper.setAttribute('game', gameId);
+        function startApp(mode) {
             wrapper.setAttribute('mode', mode);
-
-            document.getElementById('login').style.display = 'none';
+            loginPage.style.display = 'none';
             wrapper.style.display = 'block';
 
             new EntryPoint.default(function () {
                 wrapper.style.display = 'none';
-                document.getElementById('login').style.display = 'block';
+                loginPage.style.display = 'block';
             });
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            wrapper.setAttribute('user', document.getElementById('login-coach').value);
+            wrapper.setAttribute('password', document.getElementById('login-password').value);
+            wrapper.setAttribute('game', document.getElementById('login-gameid').value);
+
+            startApp(document.querySelector('input[name=login-mode]:checked').value);
+        });
+
+        // FUMBBL Client ID/Secret are remembered in the browser after first entry
+        // so the OAuth app (https://fumbbl.com/p/oauth) only needs to be set up once.
+        var fumbblUserIdField = document.getElementById('fumbbl-user-id');
+        var fumbblClientIdField = document.getElementById('fumbbl-client-id');
+        var fumbblClientSecretField = document.getElementById('fumbbl-client-secret');
+
+        try {
+            fumbblUserIdField.value = localStorage.getItem('fumbbl_user_id') || '';
+            fumbblClientIdField.value = localStorage.getItem('fumbbl_client_id') || '';
+            fumbblClientSecretField.value = localStorage.getItem('fumbbl_client_secret') || '';
+        } catch (e) {
+            // localStorage unavailable (e.g. private browsing) - just leave fields blank.
+        }
+
+        function refreshMatchList() {
+            fetch('/matches')
+                .then(function (response) { return response.json(); })
+                .then(function (matches) {
+                    var list = document.getElementById('match-list');
+                    list.innerHTML = '';
+                    matches.forEach(function (match) {
+                        var item = document.createElement('li');
+                        var link = document.createElement('a');
+                        link.href = '#';
+                        link.textContent = match.teams[0].name + ' vs ' + match.teams[1].name + ' (Turn ' + match.turn + ')';
+                        link.addEventListener('click', function (event) {
+                            event.preventDefault();
+                            wrapper.setAttribute('game', match.id);
+                            wrapper.setAttribute('user', window.fumbblAuth.user_id);
+                            wrapper.setAttribute('auth', window.fumbblAuth.token);
+                            startApp('spectator');
+                        });
+                        item.appendChild(link);
+                        list.appendChild(item);
+                    });
+                });
+        }
+
+        document.getElementById('fumbbl-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var userId = fumbblUserIdField.value;
+            var clientId = fumbblClientIdField.value;
+            var clientSecret = fumbblClientSecretField.value;
+
+            try {
+                localStorage.setItem('fumbbl_user_id', userId);
+                localStorage.setItem('fumbbl_client_id', clientId);
+                localStorage.setItem('fumbbl_client_secret', clientSecret);
+            } catch (e) {
+                // Ignore - credentials just won't be remembered next time.
+            }
+
+            document.getElementById('fumbbl-error').textContent = '';
+
+            fetch('/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, client_id: clientId, client_secret: clientSecret })
+            })
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    if (data.error) {
+                        document.getElementById('fumbbl-error').textContent = data.error;
+                        return;
+                    }
+                    window.fumbblAuth = data;
+                    refreshMatchList();
+                });
         });
     </script>
 </body>
