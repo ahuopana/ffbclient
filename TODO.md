@@ -48,10 +48,15 @@ next high-value thing to try.
       test coaches `Kalimar`/`BattleLore`/`LordCrunchy`/`LordMisery` via `DbInitializer`; check
       `../ffb/ffb-server/teams/*.xml` for loadable teams, or start a game via the legacy AWT client
       pointed at `localhost:22227`).
-- [ ] Drive this client's connect scene through a real join (bypass the `fumbblapi.js`/fumbbl.com OAuth
-      lobby for local testing — e.g. set `#wrapper`'s `user`/`auth`/`game` attributes manually, or add a
-      dev-only shortcut) and confirm the loading screen now shows the status/version/join text described
-      above, and that the game state actually renders.
+- [x] Drive this client's connect scene through a real join without the `fumbblapi.js`/fumbbl.com OAuth
+      lobby: `index.html` now has a coach/password/game-ID login form that sets `#wrapper`'s
+      `user`/`password`/`game`/`mode` attributes directly, and `core/network.ts` completes the
+      `clientPasswordChallenge`/`serverPasswordChallenge` handshake (`core/passwordchallenge.ts`, a port
+      of `com.fumbbl.ffb.PasswordChallenge`) instead of requiring a pre-obtained auth token. The FUMBBL
+      OAuth lobby still works as an alternative (Client ID/Secret now entered in-browser and remembered
+      via `localStorage` instead of `auth.json`) but is no longer the only way to join.
+      **Still needs manual verification against a real/containerized server**: confirm the loading screen
+      shows the status/version/join text described above, and that the game state actually renders.
 
 ## P2 — protocol/command parity (the bulk of the remaining work)
 
