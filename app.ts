@@ -55,12 +55,16 @@ export default class App extends Phaser.Game implements EventListener {
         let el = document.getElementById('wrapper');
         let user = el.getAttribute('user');
         let auth = el.getAttribute('auth');
+        let password = el.getAttribute('password');
         let gameAttr = el.getAttribute('game');
+        let mode = el.getAttribute('mode') || 'spectator';
 
         controller.setScene("connectScene", {
             user: user,
             auth: auth,
-            gameId: gameAttr
+            password: password,
+            gameId: gameAttr,
+            mode: mode,
         });
 
         let fullscreenButton = document.getElementById('fullscreen');

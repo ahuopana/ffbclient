@@ -1,5 +1,6 @@
 import LZString from "lz-string";
 import { Coordinate } from "../types";
+import { createChallengeResponse } from "./passwordchallenge";
 
 export class Network {
     private ws: WebSocket;
@@ -45,22 +46,40 @@ export class Network {
     }
 
     public join() {
-        let requestVersionMessage = {
-            netCommandId: "clientRequestVersion"
-        };
+        this.send({ netCommandId: "clientRequestVersion" });
 
+        if (this.config.auth) {
+            // Pre-authenticated (e.g. a FUMBBL OAuth token obtained by the lobby)
+            // joins skip the password challenge, matching LoginLogicModule's
+            // sendChallenge(): an already-available authentication token is sent
+            // straight to clientJoin instead of being put through PasswordChallenge.
+            this.sendJoin(this.config.auth);
+        } else {
+            this.send({ netCommandId: 'clientPasswordChallenge', coach: this.config.user });
+        }
+    }
+
+    /**
+     * Handles serverPasswordChallenge: computes the response per
+     * com.fumbbl.ffb.PasswordChallenge and joins with it as clientJoin's password,
+     * exactly as LoginLogicModule.handlePasswordChallenge does.
+     */
+    public sendPasswordChallengeResponse(challenge: string) {
+        this.sendJoin(createChallengeResponse(this.config.password || '', challenge));
+    }
+
+    private sendJoin(password: string) {
         let joinMessage = {
             netCommandId: 'clientJoin',
-            clientMode: 'spectator',
+            clientMode: this.config.mode || 'spectator',
             coach: this.config.user,
-            password: this.config.auth,
+            password: password,
             gameId: parseInt(this.config.gameId),
             gameName: '',
             teamId: '',
             teamName: '',
         };
 
-        this.send(requestVersionMessage);
         this.send(joinMessage);
     }
 

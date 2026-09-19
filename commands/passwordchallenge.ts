@@ -11,5 +11,6 @@ export class CommandPasswordChallenge extends Command {
         console.log("Server password challenge received");
 
         this.controller.enqueueCommand(new ClientCommands.SetPasswordChallengeIssued());
+        this.controller.respondToPasswordChallenge(data.challenge);
     }
 }

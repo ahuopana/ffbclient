@@ -6,6 +6,7 @@ function makeControllerMock() {
     return {
         enqueueCommand: jest.fn(),
         triggerEvent: jest.fn(),
+        respondToPasswordChallenge: jest.fn(),
     } as unknown as Core.Controller;
 }
 
@@ -21,6 +22,7 @@ describe('CommandPasswordChallenge', () => {
 
         command.processCommand(data);
 
+        expect(controller.respondToPasswordChallenge).toHaveBeenCalledWith('abc123');
         expect(controller.enqueueCommand).toHaveBeenCalledTimes(1);
         let enqueued = (controller.enqueueCommand as jest.Mock).mock.calls[0][0];
 

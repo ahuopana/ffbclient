@@ -129,6 +129,10 @@ export class Controller {
         this.network.sendKickoff(coordinate);
     }
 
+    public respondToPasswordChallenge(challenge: string) {
+        this.network.sendPasswordChallengeResponse(challenge);
+    }
+
     public triggerEvent(eventType: Types.EventType, data?: any) {
         this.handleEvent(eventType, data);
         this.eventListeners.forEach((listener) => listener.handleEvent(eventType, data));
