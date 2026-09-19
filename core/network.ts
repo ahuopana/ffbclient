@@ -39,7 +39,7 @@ export class Network {
 
     }
 
-    public connect(commandHandler: any, config: any) {
+    public connect(commandHandler: any, config: any, onConnectionError?: (message: string) => void) {
         this.config = config;
 
         // FFB_SERVER_* are injected at build time (see webpack.config.js) so a dev/test
@@ -53,12 +53,15 @@ export class Network {
 
         ({ host, port, proto } = applyServerOverride(config.server, { host, port, proto }));
 
-        console.log("Connecting to "+proto+"//"+host+":"+port);
+        let target = proto+"//"+host+":"+port;
+        console.log("Connecting to "+target);
 
-        let ws: WebSocket = new WebSocket(proto+"//"+host+":"+port+"/command");
+        let ws: WebSocket = new WebSocket(target+"/command");
+        let opened = false;
 
         ws.onopen = (evt) => {
             console.log('Open');
+            opened = true;
             this.join();
         };
 
@@ -68,8 +71,19 @@ export class Network {
             commandHandler.handleCommand(JSON.parse(msg));
         };
 
+        ws.onerror = (evt) => {
+            console.log('Error', evt);
+        };
+
+        // A close before the connection ever opened means the target
+        // host/port is unreachable or refusing connections - without this,
+        // the connect scene is stuck on "Connecting..." forever since no
+        // serverStatus/serverVersion ever arrives to say otherwise.
         ws.onclose = (evt) => {
             console.log('Close');
+            if (!opened && onConnectionError) {
+                onConnectionError("Could not connect to " + target + " - check the server address");
+            }
         };
 
         this.ws = ws;

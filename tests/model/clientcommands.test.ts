@@ -133,6 +133,32 @@ describe('SetPasswordChallengeIssued', () => {
     });
 });
 
+describe('SetConnectionError', () => {
+    let game: Model.Game;
+    let controller: Core.Controller;
+
+    beforeEach(() => {
+        game = new Model.Game();
+        controller = makeControllerMock();
+    });
+
+    test('records the connection error message', () => {
+        let command = new ClientCommands.SetConnectionError('Could not connect to ws://example.com:22223 - check the server address');
+        command.apply(game, controller);
+
+        expect(game.getConnectionInfo().getConnectionError()).toBe(
+            'Could not connect to ws://example.com:22223 - check the server address'
+        );
+    });
+
+    test('triggers ConnectionInfoChanged', () => {
+        let command = new ClientCommands.SetConnectionError('failed');
+        command.apply(game, controller);
+
+        expect(controller.triggerEvent).toHaveBeenCalledWith(EventType.ConnectionInfoChanged);
+    });
+});
+
 describe('AddPlayer', () => {
     test('adds the player to the team named in the message', () => {
         let game = makeGameWithTeams('home', 'away');

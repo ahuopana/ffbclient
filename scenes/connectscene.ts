@@ -67,6 +67,11 @@ export class ConnectScene extends AbstractScene implements Types.EventListener {
 
         let connectionInfo = this.controller.Game.getConnectionInfo();
 
+        if (connectionInfo.getConnectionError()) {
+            this.loadingText.setText(connectionInfo.getConnectionError());
+            return;
+        }
+
         if (!connectionInfo.isServerAvailable()) {
             this.loadingText.setText("Server unavailable: " + connectionInfo.getServerStatusMessage());
             return;

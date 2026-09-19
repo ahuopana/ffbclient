@@ -21,6 +21,7 @@ export class ConnectionInfo {
     private versionMismatch: boolean;
 
     private passwordChallengeIssued: boolean;
+    private connectionError: string;
 
     private teamList: FFB.Protocol.Messages.TeamListEntryType[];
     private gameList: FFB.Protocol.Messages.GameListEntryType[];
@@ -124,6 +125,19 @@ export class ConnectionInfo {
 
     public isPasswordChallengeIssued(): boolean {
         return this.passwordChallengeIssued;
+    }
+
+    /**
+     * The WebSocket itself failed or closed before a server response ever
+     * arrived (e.g. wrong host/port) - surfaced separately from serverStatus
+     * since the server never got a chance to send one.
+     */
+    public setConnectionError(message: string) {
+        this.connectionError = message;
+    }
+
+    public getConnectionError(): string {
+        return this.connectionError;
     }
 
     /**

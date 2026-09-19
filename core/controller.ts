@@ -144,7 +144,11 @@ export class Controller {
 
     public connect(config: any) {
         this.commandHandler = new Core.CommandHandler(this.network, this);
-        this.network.connect(this.commandHandler, config);
+        this.network.connect(this.commandHandler, config, (message) => this.reportConnectionError(message));
+    }
+
+    public reportConnectionError(message: string) {
+        this.enqueueCommand(new ClientCommands.SetConnectionError(message));
     }
 
     /**

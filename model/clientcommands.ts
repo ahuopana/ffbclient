@@ -760,6 +760,24 @@ export class SetPasswordChallengeIssued extends AbstractCommand {
     }
 }
 
+export class SetConnectionError extends AbstractCommand {
+    private message: string;
+
+    public constructor(message: string) {
+        super();
+        this.triggerModelChanged = false;
+        this.message = message;
+    }
+
+    public do() {
+        this.game.getConnectionInfo().setConnectionError(this.message);
+        this.controller.triggerEvent(EventType.ConnectionInfoChanged);
+    }
+
+    public undo() {
+    }
+}
+
 export class SetLeft extends AbstractCommand {
     private data: FFB.Protocol.Messages.ServerLeave;
 

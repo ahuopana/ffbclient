@@ -19,6 +19,21 @@ describe('ConnectionInfo', () => {
         test('has no password challenge issued', () => {
             expect(connectionInfo.isPasswordChallengeIssued()).toBe(false);
         });
+
+        test('has no connection error', () => {
+            expect(connectionInfo.getConnectionError()).toBeUndefined();
+        });
+    });
+
+    describe('setConnectionError', () => {
+        test('records the message', () => {
+            let connectionInfo = new ConnectionInfo();
+            connectionInfo.setConnectionError('Could not connect to ws://example.com:22223 - check the server address');
+
+            expect(connectionInfo.getConnectionError()).toBe(
+                'Could not connect to ws://example.com:22223 - check the server address'
+            );
+        });
     });
 
     describe('setJoined', () => {
